@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 @WebServlet("/fatigueTest")
@@ -49,8 +50,14 @@ public class FatigueTest extends HttpServlet {
         writeToFatigue.flush();
         String output = "";
         while (!(output.equals("0") || output.equals("1"))) {
-            output = fatigueOutput.nextLine();
-            System.out.println(output);
+            try {
+                output = fatigueOutput.nextLine();
+                System.out.println(output);
+            }catch (NoSuchElementException e){
+                while (fatigueErrors.hasNext()){
+                    System.out.println(fatigueErrors.next());
+                }
+            }
         }
         return output.equals("1");
     }
