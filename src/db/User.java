@@ -13,11 +13,14 @@ public class User {
     public String surname;
     public Event[] events;
 
-    public User(String json){
+    public User() {
+    }
+
+    public User(String json) {
         getFromJSON(new JSONObject(json));
     }
 
-    public User(JSONObject jsonUser){
+    public User(JSONObject jsonUser) {
         getFromJSON(jsonUser);
     }
 
@@ -55,7 +58,7 @@ public class User {
         return toJSON().toString();
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
         jsonEvent.put("id", id);
         jsonEvent.put("email", email);
@@ -63,10 +66,12 @@ public class User {
         jsonEvent.put("name", name);
         jsonEvent.put("surname", surname);
         JSONArray jsonEvents = new JSONArray();
-        for (Event event:events){
-            jsonEvents.put(event.toJSON());
+        if (events != null) {
+            for (Event event : events) {
+                jsonEvents.put(event.toJSON());
+            }
+            jsonEvent.put("events", jsonEvents);
         }
-        jsonEvent.put("events",jsonEvents);
         return jsonEvent;
     }
 }
