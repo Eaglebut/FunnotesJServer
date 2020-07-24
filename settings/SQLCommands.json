@@ -49,5 +49,25 @@
     "'\n\tWHERE id = ",
     null,
     ";"
+  ],
+  "get_event": [
+    "SELECT id, user_id, start_time, end_time, title, description\n\tFROM public.events\n\tWHERE user_id = ",
+    null,
+    " AND id = ",
+    null,
+    ";"
+  ],
+  "insert_event": [
+    "INSERT INTO public.events(\n\tid, user_id, start_time, end_time, title, description)\n\tVALUES (default,",
+    null,
+    ",TO_TIMESTAMP(",
+    null,
+    "),TO_TIMESTAMP(",
+    null,
+    "),'",
+    null,
+    "','",
+    null,
+    "');"
   ]
 }

@@ -6,14 +6,43 @@ import org.json.JSONObject;
 import java.util.Set;
 
 public class User {
-    public int id;
-    public String email;
-    public String password;
-    public String name;
-    public String surname;
-    public Event[] events;
+    private int id;
+    private String email;
+    private String password;
+    private String name;
+    private String surname;
+    private Event[] events;
 
     public User() {
+    }
+
+    public User(int id, String email, String password, String name, String surname, Event[] events) {
+        this.setId(id);
+        this.setEmail(email);
+        this.setPassword(password);
+        this.setName(name);
+        this.setSurname(surname);
+        this.setEvents(events);
+    }
+
+    public User(String email, String password) {
+        this.setEmail(email);
+        this.setPassword(password);
+    }
+
+    public User(String email, String password, String name, String surname) {
+        this.setEmail(email);
+        this.setPassword(password);
+        this.setName(name);
+        this.setSurname(surname);
+    }
+
+    public User(int id) {
+        this.setId(id);
+    }
+
+    public boolean isValid() {
+        return getEmail() != null && getPassword() != null;
     }
 
     public User(String json) {
@@ -27,28 +56,28 @@ public class User {
     private void getFromJSON(JSONObject jsonUser) {
         Set<String> keys = jsonUser.keySet();
         if(keys.contains("id")){
-            id = jsonUser.getInt("id");
+            setId(jsonUser.getInt("id"));
         }
         if(keys.contains("email")){
-            email = jsonUser.getString("email");
+            setEmail(jsonUser.getString("email"));
         }
         if(keys.contains("password")){
-            password = jsonUser.getString("password");
+            setPassword(jsonUser.getString("password"));
         }
         if(keys.contains("name")){
-            name = jsonUser.getString("name");
+            setName(jsonUser.getString("name"));
         }
         if(keys.contains("surname")){
-            surname = jsonUser.getString("surname");
+            setSurname(jsonUser.getString("surname"));
         }
         if(keys.contains("surname")){
-            surname = jsonUser.getString("surname");
+            setSurname(jsonUser.getString("surname"));
         }
         if(keys.contains("events")){
             JSONArray jsonEvents = jsonUser.getJSONArray("events");
-            events = new Event[jsonEvents.length()];
+            setEvents(new Event[jsonEvents.length()]);
             for (int i = 0; i < jsonEvents.length(); i++){
-                events[i] = new Event(jsonEvents.getJSONObject(i));
+                getEvents()[i] = new Event(jsonEvents.getJSONObject(i));
             }
         }
     }
@@ -60,18 +89,66 @@ public class User {
 
     public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put("id", id);
-        jsonEvent.put("email", email);
-        jsonEvent.put("password", password);
-        jsonEvent.put("name", name);
-        jsonEvent.put("surname", surname);
+        jsonEvent.put("id", getId());
+        jsonEvent.put("email", getEmail());
+        jsonEvent.put("password", getPassword());
+        jsonEvent.put("name", getName());
+        jsonEvent.put("surname", getSurname());
         JSONArray jsonEvents = new JSONArray();
-        if (events != null) {
-            for (Event event : events) {
+        if (getEvents() != null) {
+            for (Event event : getEvents()) {
                 jsonEvents.put(event.toJSON());
             }
             jsonEvent.put("events", jsonEvents);
         }
         return jsonEvent;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public Event[] getEvents() {
+        return events;
+    }
+
+    public void setEvents(Event[] events) {
+        this.events = events;
     }
 }

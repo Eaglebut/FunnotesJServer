@@ -24,17 +24,38 @@ public class PostgresAdapter {
     private static final String COMMAND_FILE = "SQLCommands.json";
     private static final String CREATE_DATABASE_JSON = "create_database";
 
+    private static final String DATABASE_OPENED_MESSAGE = "Opened database successfully";
+    private static final String DATABASE_NOT_OPENED_MESSAGE = "Database not opened";
+    private static final String COMMAND_FILE_NOT_FOUND_MESSAGE = "Command file not found";
+
+    private static final long MSECOND = 1000;
+
     public static final int COMPLETED = 0;
     public static final int FAILED = 1;
 
+    private static class DatabaseIds {
+        private static final String ID = "id";
+        private static final String USER_ID = "user_id";
+        private static final String START_TIME = "start_time";
+        private static final String END_TIME = "end_time";
+        private static final String TITLE = "title";
+        private static final String DESCRIPTION = "description";
+
+        private static final String NAME = "name";
+        private static final String SURNAME = "surname";
+        private static final String REGISTRATION_TIME = "registration_time";
+        private static final String EMAIL = "email";
+        private static final String PASSWORD = "password";
+    }
+
     public static class GetUserConstants {
-        private static final String GET_USER_JSON = "get_user";
+        private static final String JSON = "get_user";
         private static final int EMAIL = 1;
         private static final int PASSWORD = 3;
     }
 
     public static class InsertUserConstants {
-        private static final String INSERT_USER_JSON = "insert_user";
+        private static final String JSON = "insert_user";
         private static final int NAME = 1;
         private static final int SURNAME = 3;
         private static final int EMAIL = 5;
@@ -42,12 +63,12 @@ public class PostgresAdapter {
     }
 
     public static class DeleteUserConstants {
-        private static final String DELETE_USER_JSON = "delete_user";
+        private static final String JSON = "delete_user";
         private static final int ID = 1;
     }
 
     public static class UpdateUserConstants {
-        private static final String UPDATE_USER_JSON = "update_user";
+        private static final String JSON = "update_user";
         private static final int NAME = 1;
         private static final int SURNAME = 3;
         private static final int EMAIL = 5;
@@ -55,6 +76,20 @@ public class PostgresAdapter {
         private static final int ID = 9;
     }
 
+    public static class GetEventConstants {
+        private static final String JSON = "get_event";
+        private static final int USER_ID = 1;
+        private static final int ID = 3;
+    }
+
+    public static class InsertEventConstants {
+        private static final String JSON = "insert_event";
+        private static final int USER_ID = 1;
+        private static final int START_TIME = 3;
+        private static final int END_TIME = 5;
+        private static final int TITLE = 7;
+        private static final int DESCRIPTION = 9;
+    }
 
     public PostgresAdapter(String user, String password, String databaseName) throws SQLException, FileNotFoundException {
         setUser(user);
@@ -99,21 +134,20 @@ public class PostgresAdapter {
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.out.println("Database not opened");
+            System.out.println(DATABASE_NOT_OPENED_MESSAGE);
         }
 
 
-        System.out.println("Opened database successfully");
+        System.out.println(DATABASE_OPENED_MESSAGE);
     }
 
     private Statement createStatement() throws SQLException {
         if (!connection.isClosed()) {
             return connection.createStatement();
         } else {
-            throw new SQLException("database not opened");
+            throw new SQLException(DATABASE_NOT_OPENED_MESSAGE);
         }
     }
-
 
     public void createDatabase() throws SQLException {
         Statement statement = createStatement();
@@ -127,7 +161,6 @@ public class PostgresAdapter {
             connection.setAutoCommit(true);
         }
 
-
     public void loadCommandsFromFile() throws FileNotFoundException {
         String commandsString;
         StringBuilder commandsStringBuilder = new StringBuilder();
@@ -140,7 +173,7 @@ public class PostgresAdapter {
             }
             commandsString = commandsStringBuilder.toString();
             this.commands = new JSONObject(commandsString);
-        } else throw new FileNotFoundException("Command file not found");
+        } else throw new FileNotFoundException(COMMAND_FILE_NOT_FOUND_MESSAGE);
     }
 
     public boolean isConnected() throws SQLException {
@@ -156,37 +189,46 @@ public class PostgresAdapter {
         return queryString.toString();
     }
 
-    public User getUser(String email, String password) throws SQLException {
-        Statement statement = createStatement();
-        JSONArray sqlArray = commands.getJSONArray(GetUserConstants.GET_USER_JSON);
+    public User getUser(String email, String password) {
+        if (email == null && password == null) {
+            return null;
+        }
+        JSONArray sqlArray = commands.getJSONArray(GetUserConstants.JSON);
         sqlArray.put(GetUserConstants.EMAIL, email);
         sqlArray.put(GetUserConstants.PASSWORD, password);
 
-        String queryString = getSQLString(sqlArray);
-        ResultSet set = statement.executeQuery(queryString);
+        Statement statement;
+        ResultSet set;
         User user = new User();
-        while (set.next()) {
-            user.id = set.getInt("id");
-            user.email = (String) set.getObject("email");
-            user.password = set.getString("password");
-            user.name = set.getString("name");
-            user.surname = set.getString("surname");
-        }
-        statement.close();
-        /*if(user.id == 0){
+        try {
+            statement = createStatement();
+            set = statement.executeQuery(getSQLString(sqlArray));
+            while (set.next()) {
+                user.setId(set.getInt(DatabaseIds.ID));
+                user.setEmail((String) set.getObject(DatabaseIds.EMAIL));
+                user.setPassword(set.getString(DatabaseIds.PASSWORD));
+                user.setName(set.getString(DatabaseIds.NAME));
+                user.setSurname(set.getString(DatabaseIds.SURNAME));
+            }
+            statement.close();
+        } catch (SQLException exception) {
+            System.out.println(exception.getMessage());
             return null;
-        }*/
+        }
         return user;
     }
 
-    public int insertUser(User user) {
-        JSONArray sqlArray = commands.getJSONArray(InsertUserConstants.INSERT_USER_JSON);
-        sqlArray.put(InsertUserConstants.NAME, user.name);
-        sqlArray.put(InsertUserConstants.SURNAME, user.surname);
-        sqlArray.put(InsertUserConstants.EMAIL, user.email);
-        sqlArray.put(InsertUserConstants.PASSWORD, user.password);
-        return executeStatement(getSQLString(sqlArray));
+    public User getUser(User user) {
+        return getUser(user.getEmail(), user.getPassword());
+    }
 
+    public int insertUser(User user) {
+        JSONArray sqlArray = commands.getJSONArray(InsertUserConstants.JSON);
+        sqlArray.put(InsertUserConstants.NAME, user.getName());
+        sqlArray.put(InsertUserConstants.SURNAME, user.getSurname());
+        sqlArray.put(InsertUserConstants.EMAIL, user.getEmail());
+        sqlArray.put(InsertUserConstants.PASSWORD, user.getPassword());
+        return executeStatement(getSQLString(sqlArray));
     }
 
     private int executeStatement(String queryString) {
@@ -197,71 +239,139 @@ public class PostgresAdapter {
             return COMPLETED;
         } catch (SQLException exception) {
             //TODO Обрабатывать разные ошибки
-            exception.printStackTrace();
+            System.out.println(exception.getMessage());
             return FAILED;
         }
     }
 
-
     public int insertUser(String name, String surname, String email, String password) {
         User user = new User();
-        user.name = name;
-        user.surname = surname;
-        user.email = email;
-        user.password = password;
+        user.setName(name);
+        user.setSurname(surname);
+        user.setEmail(email);
+        user.setPassword(password);
         return insertUser(user);
     }
 
     public int deleteUser(User user) {
-        if (user.id == 0) {
+        if (user.getId() == 0) {
             return FAILED;
         }
-        JSONArray sqlArray = commands.getJSONArray(DeleteUserConstants.DELETE_USER_JSON);
-        sqlArray.put(DeleteUserConstants.ID, String.valueOf(user.id));
+        JSONArray sqlArray = commands.getJSONArray(DeleteUserConstants.JSON);
+        sqlArray.put(DeleteUserConstants.ID, String.valueOf(user.getId()));
         return executeStatement(getSQLString(sqlArray));
     }
 
     public int deleteUser(int id) {
         User user = new User();
-        user.id = id;
+        user.setId(id);
         return deleteUser(user);
     }
 
     public int updateUser(User user) {
-        JSONArray sqlArray = commands.getJSONArray(UpdateUserConstants.UPDATE_USER_JSON);
-        sqlArray.put(UpdateUserConstants.NAME, user.name);
-        sqlArray.put(UpdateUserConstants.SURNAME, user.surname);
-        sqlArray.put(UpdateUserConstants.EMAIL, user.email);
-        sqlArray.put(UpdateUserConstants.PASSWORD, user.password);
-        sqlArray.put(UpdateUserConstants.ID, String.valueOf(user.id));
+        JSONArray sqlArray = commands.getJSONArray(UpdateUserConstants.JSON);
+        sqlArray.put(UpdateUserConstants.NAME, user.getName());
+        sqlArray.put(UpdateUserConstants.SURNAME, user.getSurname());
+        sqlArray.put(UpdateUserConstants.EMAIL, user.getEmail());
+        sqlArray.put(UpdateUserConstants.PASSWORD, user.getPassword());
+        sqlArray.put(UpdateUserConstants.ID, String.valueOf(user.getId()));
         return executeStatement(getSQLString(sqlArray));
     }
 
     public int updateUser(int id, String email, String password, String name, String surname) {
         User user = new User();
-        user.email = email;
-        user.password = password;
-        user.name = name;
-        user.surname = surname;
-        user.id = id;
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+        user.setSurname(surname);
+        user.setId(id);
         return updateUser(user);
     }
 
+    public Event getEvent(String email, String password, int id) {
+        JSONArray sqlArray = commands.getJSONArray(GetEventConstants.JSON);
+        User user = getUser(email, password);
+        if (!(user != null && user.isValid()))
+            return null;
+        sqlArray.put(GetEventConstants.USER_ID, String.valueOf(user.getId()));
+        sqlArray.put(GetEventConstants.ID, String.valueOf(id));
+
+        Statement statement;
+        ResultSet set;
+        Event event = new Event();
+        try {
+            statement = createStatement();
+            set = statement.executeQuery(getSQLString(sqlArray));
+            while (set.next()) {
+                event.id = set.getInt(DatabaseIds.ID);
+                event.userId = set.getInt(DatabaseIds.USER_ID);
+                event.startTime = set.getTime(DatabaseIds.START_TIME);
+                event.endTime = set.getTime(DatabaseIds.END_TIME);
+                event.title = set.getString(DatabaseIds.TITLE);
+                event.description = set.getString(DatabaseIds.DESCRIPTION);
+            }
+            statement.close();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return event;
+    }
+
+    public Event getEvent(User user, Event event) {
+        return getEvent(user.getEmail(), user.getPassword(), event.id);
+    }
+
+    public Event getEvent(String email, String password, Event event) {
+        return getEvent(email, password, event.id);
+    }
+
+    public Event getEvent(User user, int id) {
+        return getEvent(user.getEmail(), user.getPassword(), id);
+    }
+
+    public int insertEvent(User user, Event event) {
+        if (!user.isValid())
+            return FAILED;
+        user = getUser(user);
+        JSONArray sqlArray = commands.getJSONArray(InsertEventConstants.JSON);
+        sqlArray.put(InsertEventConstants.DESCRIPTION, event.description);
+        long startTime = event.startTime.getTime() / MSECOND;
+        long endTime = event.endTime.getTime() / MSECOND;
+        sqlArray.put(InsertEventConstants.END_TIME, String.valueOf(endTime));
+        sqlArray.put(InsertEventConstants.START_TIME, String.valueOf(startTime));
+        sqlArray.put(InsertEventConstants.TITLE, event.title);
+        sqlArray.put(InsertEventConstants.USER_ID, String.valueOf(user.getId()));
+        return executeStatement(getSQLString(sqlArray));
+    }
+
+    public int insertEvent(String email, String password, Event event) {
+        return insertEvent(new User(email, password), event);
+    }
+
+    public int insertEvent(User user, Time start_time, Time end_time, String title, String description) {
+        return insertEvent(user,
+                new Event(start_time, end_time, title, description));
+    }
+
+    public int insertEvent(String email, String password, Time start_time, Time end_time, String title, String description) {
+        return insertEvent(new User(email, password), new Event(start_time, end_time, title, description));
+    }
 
     public static void main(String[] args) throws FileNotFoundException, SQLException {
         PostgresAdapter adapter = new PostgresAdapter("postgres", "0671211664Q", "test1");
         adapter.connect();
         User user = new User();
-        user.name = "Test";
-        user.surname = "Test";
-        user.email = "test@test.test";
-        user.password = "password";
-        System.out.println(adapter.insertUser(user));
-        user = adapter.getUser(user.email, user.password);
+        user.setName("Test");
+        user.setSurname("Test");
+        user.setEmail("test@test.test");
+        user.setPassword("password");
+        adapter.insertUser(user);
+        user = adapter.getUser(user.getEmail(), user.getPassword());
         System.out.println(user);
-        user.name = "Testt";
-        System.out.println(adapter.updateUser(user));
-        System.out.println(adapter.getUser(user.email, user.password));
-        adapter.deleteUser(user);
+        Event event = adapter.getEvent(user.getEmail(), user.getPassword(), 15);
+        System.out.println(event);
+        Event event1 = new Event(user.getId(), "test2", "test2dwada");
+        adapter.insertEvent(user, event1);
+
     }
 }
