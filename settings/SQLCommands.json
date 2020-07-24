@@ -20,5 +20,34 @@
     "' AND password = '",
     null,
     "'"
+  ],
+  "insert_user": [
+    "INSERT INTO public.users(\n\tid, name, surname, registration_time, email, password)\n\tVALUES (default,'",
+    null,
+    "','",
+    null,
+    "', default, '",
+    null,
+    "', '",
+    null,
+    "')"
+  ],
+  "delete_user": [
+    "DELETE FROM public.users\n\tWHERE id = ",
+    null,
+    ";"
+  ],
+  "update_user": [
+    "UPDATE public.users\n\tSET name='",
+    null,
+    "', surname='",
+    null,
+    "', email='",
+    null,
+    "', password='",
+    null,
+    "'\n\tWHERE id = ",
+    null,
+    ";"
   ]
 }
