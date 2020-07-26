@@ -6,10 +6,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class PostgresAdapter {
-
 
     private Connection connection = null;
 
@@ -89,6 +89,27 @@ public class PostgresAdapter {
         private static final int END_TIME = 5;
         private static final int TITLE = 7;
         private static final int DESCRIPTION = 9;
+    }
+
+    public static class GetUserEventsConstants {
+        private static final String JSON = "get_user_events";
+        private static final int USER_ID = 1;
+    }
+
+    public static class UpdateEventConstants {
+        private static final String JSON = "update_event";
+        private static final int START_TIME = 1;
+        private static final int END_TIME = 3;
+        private static final int TITLE = 5;
+        private static final int DESCRIPTION = 7;
+        private static final int ID = 11;
+        private static final int USER_ID = 9;
+    }
+
+    public static class DeleteEventConstants {
+        private static final String JSON = "delete_event";
+        private static final int ID = 3;
+        private static final int USER_ID = 1;
     }
 
     public PostgresAdapter(String user, String password, String databaseName) throws SQLException, FileNotFoundException {
@@ -223,6 +244,9 @@ public class PostgresAdapter {
     }
 
     public int insertUser(User user) {
+        if (user == null || !user.isValid()) {
+            return FAILED;
+        }
         JSONArray sqlArray = commands.getJSONArray(InsertUserConstants.JSON);
         sqlArray.put(InsertUserConstants.NAME, user.getName());
         sqlArray.put(InsertUserConstants.SURNAME, user.getSurname());
@@ -254,7 +278,11 @@ public class PostgresAdapter {
     }
 
     public int deleteUser(User user) {
-        if (user.getId() == 0) {
+        if (user == null || !user.isValid()) {
+            return FAILED;
+        }
+        user = getUser(user);
+        if (!user.isValid()) {
             return FAILED;
         }
         JSONArray sqlArray = commands.getJSONArray(DeleteUserConstants.JSON);
@@ -262,13 +290,14 @@ public class PostgresAdapter {
         return executeStatement(getSQLString(sqlArray));
     }
 
-    public int deleteUser(int id) {
-        User user = new User();
-        user.setId(id);
-        return deleteUser(user);
+    public int deleteUser(String email, String password) {
+        return deleteUser(new User(email, password));
     }
 
     public int updateUser(User user) {
+        if (!user.isValid()) {
+            return FAILED;
+        }
         JSONArray sqlArray = commands.getJSONArray(UpdateUserConstants.JSON);
         sqlArray.put(UpdateUserConstants.NAME, user.getName());
         sqlArray.put(UpdateUserConstants.SURNAME, user.getSurname());
@@ -288,11 +317,18 @@ public class PostgresAdapter {
         return updateUser(user);
     }
 
-    public Event getEvent(String email, String password, int id) {
-        JSONArray sqlArray = commands.getJSONArray(GetEventConstants.JSON);
-        User user = getUser(email, password);
-        if (!(user != null && user.isValid()))
+    public Event getEvent(User user, int id) {
+        if (user == null || !user.isValid()) {
             return null;
+        }
+        user = getUser(user);
+
+        if (!user.isValid()) {
+            return null;
+        }
+
+        JSONArray sqlArray = commands.getJSONArray(GetEventConstants.JSON);
+
         sqlArray.put(GetEventConstants.USER_ID, String.valueOf(user.getId()));
         sqlArray.put(GetEventConstants.ID, String.valueOf(id));
 
@@ -303,12 +339,12 @@ public class PostgresAdapter {
             statement = createStatement();
             set = statement.executeQuery(getSQLString(sqlArray));
             while (set.next()) {
-                event.id = set.getInt(DatabaseIds.ID);
-                event.userId = set.getInt(DatabaseIds.USER_ID);
-                event.startTime = set.getTime(DatabaseIds.START_TIME);
-                event.endTime = set.getTime(DatabaseIds.END_TIME);
-                event.title = set.getString(DatabaseIds.TITLE);
-                event.description = set.getString(DatabaseIds.DESCRIPTION);
+                event.setId(set.getInt(DatabaseIds.ID));
+                event.setUserId(set.getInt(DatabaseIds.USER_ID));
+                event.setStartTime(set.getTime(DatabaseIds.START_TIME));
+                event.setEndTime(set.getTime(DatabaseIds.END_TIME));
+                event.setTitle(set.getString(DatabaseIds.TITLE));
+                event.setDescription(set.getString(DatabaseIds.DESCRIPTION));
             }
             statement.close();
         } catch (SQLException exception) {
@@ -318,28 +354,34 @@ public class PostgresAdapter {
     }
 
     public Event getEvent(User user, Event event) {
-        return getEvent(user.getEmail(), user.getPassword(), event.id);
+        return getEvent(user.getEmail(), user.getPassword(), event.getId());
     }
 
     public Event getEvent(String email, String password, Event event) {
-        return getEvent(email, password, event.id);
+        return getEvent(email, password, event.getId());
     }
 
-    public Event getEvent(User user, int id) {
-        return getEvent(user.getEmail(), user.getPassword(), id);
+    public Event getEvent(String email, String password, int id) {
+        return getEvent(new User(email, password), id);
     }
 
     public int insertEvent(User user, Event event) {
-        if (!user.isValid())
+        if (user == null || !user.isValid()) {
             return FAILED;
+        }
         user = getUser(user);
+
+        if (!user.isValid()) {
+            return FAILED;
+        }
+
         JSONArray sqlArray = commands.getJSONArray(InsertEventConstants.JSON);
-        sqlArray.put(InsertEventConstants.DESCRIPTION, event.description);
-        long startTime = event.startTime.getTime() / MSECOND;
-        long endTime = event.endTime.getTime() / MSECOND;
+        sqlArray.put(InsertEventConstants.DESCRIPTION, event.getDescription());
+        long startTime = event.getStartTime().getTime() / MSECOND;
+        long endTime = event.getEndTime().getTime() / MSECOND;
         sqlArray.put(InsertEventConstants.END_TIME, String.valueOf(endTime));
         sqlArray.put(InsertEventConstants.START_TIME, String.valueOf(startTime));
-        sqlArray.put(InsertEventConstants.TITLE, event.title);
+        sqlArray.put(InsertEventConstants.TITLE, event.getTitle());
         sqlArray.put(InsertEventConstants.USER_ID, String.valueOf(user.getId()));
         return executeStatement(getSQLString(sqlArray));
     }
@@ -357,6 +399,112 @@ public class PostgresAdapter {
         return insertEvent(new User(email, password), new Event(start_time, end_time, title, description));
     }
 
+
+    public ArrayList<Event> getUserEvents(User user) {
+        if (user == null || !user.isValid()) {
+            return null;
+        }
+
+        user = getUser(user);
+
+        if (!user.isValid()) {
+            return null;
+        }
+
+        JSONArray sqlArray = commands.getJSONArray(GetUserEventsConstants.JSON);
+        sqlArray.put(GetUserEventsConstants.USER_ID, String.valueOf(user.getId()));
+
+        ArrayList<Event> events = new ArrayList<>();
+        Statement statement;
+        ResultSet set;
+        Event event;
+        try {
+            statement = createStatement();
+            set = statement.executeQuery(getSQLString(sqlArray));
+            while (set.next()) {
+                event = new Event();
+                event.setId(set.getInt(DatabaseIds.ID));
+                event.setUserId(set.getInt(DatabaseIds.USER_ID));
+                event.setStartTime(set.getTime(DatabaseIds.START_TIME));
+                event.setEndTime(set.getTime(DatabaseIds.END_TIME));
+                event.setTitle(set.getString(DatabaseIds.TITLE));
+                event.setDescription(set.getString(DatabaseIds.DESCRIPTION));
+                events.add(event);
+            }
+            statement.close();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return events;
+    }
+
+    public ArrayList<Event> getUserEvents(String email, String password) {
+        return getUserEvents(new User(email, password));
+    }
+
+    public int updateEvent(User user, Event event) {
+        if (user == null || !user.isValid()) {
+            return FAILED;
+        }
+
+        user = getUser(user);
+
+        if (!user.isValid()) {
+            return FAILED;
+        }
+
+        JSONArray sqlArray = commands.getJSONArray(UpdateEventConstants.JSON);
+        sqlArray.put(UpdateEventConstants.ID, String.valueOf(event.getId()));
+        sqlArray.put(UpdateEventConstants.USER_ID, String.valueOf(user.getId()));
+        sqlArray.put(UpdateEventConstants.TITLE, event.getTitle());
+        sqlArray.put(UpdateEventConstants.DESCRIPTION, event.getDescription());
+        long time = event.getStartTime().getTime() / MSECOND;
+        sqlArray.put(UpdateEventConstants.START_TIME, String.valueOf(time));
+        time = event.getEndTime().getTime() / MSECOND;
+        sqlArray.put(UpdateEventConstants.END_TIME, String.valueOf(time));
+        return executeStatement(getSQLString(sqlArray));
+    }
+
+    public int updateEvent(String email, String password, Event event) {
+        return updateEvent(new User(email, password), event);
+    }
+
+    public int updateEvent(String email, String password, Time start_time, Time end_time, String title, String description) {
+        return updateEvent(new User(email, password),
+                new Event(start_time, end_time, title, description));
+    }
+
+    public int updateEvent(User user, Time start_time, Time end_time, String title, String description) {
+        return updateEvent(user,
+                new Event(start_time, end_time, title, description));
+    }
+
+    public int deleteEvent(User user, Event event) {
+        if (user == null || !user.isValid()) {
+            return FAILED;
+        }
+        user = getUser(user);
+        if (!user.isValid()) {
+            return FAILED;
+        }
+        JSONArray sqlArray = commands.getJSONArray(DeleteEventConstants.JSON);
+        sqlArray.put(DeleteEventConstants.ID, String.valueOf(event.getId()));
+        sqlArray.put(DeleteEventConstants.USER_ID, String.valueOf(user.getId()));
+        return executeStatement(getSQLString(sqlArray));
+    }
+
+    public int deleteEvent(String email, String password, Event event) {
+        return deleteEvent(new User(email, password), event);
+    }
+
+    public int deleteEvent(String email, String password, int id) {
+        return deleteEvent(new User(email, password), new Event(id));
+    }
+
+    public int deleteEvent(User user, int id) {
+        return deleteEvent(user, new Event(id));
+    }
+
     public static void main(String[] args) throws FileNotFoundException, SQLException {
         PostgresAdapter adapter = new PostgresAdapter("postgres", "0671211664Q", "test1");
         adapter.connect();
@@ -365,13 +513,14 @@ public class PostgresAdapter {
         user.setSurname("Test");
         user.setEmail("test@test.test");
         user.setPassword("password");
-        adapter.insertUser(user);
         user = adapter.getUser(user.getEmail(), user.getPassword());
+        adapter.insertEvent(user, new Event("Test title", "Test description"));
+        user.setEvents(adapter.getUserEvents(user));
         System.out.println(user);
-        Event event = adapter.getEvent(user.getEmail(), user.getPassword(), 15);
-        System.out.println(event);
-        Event event1 = new Event(user.getId(), "test2", "test2dwada");
-        adapter.insertEvent(user, event1);
-
+        Event event = user.getEvent(user.getEvents().size() - 1);
+        user = adapter.getUser(user);
+        adapter.deleteEvent(user, event);
+        user.setEvents(adapter.getUserEvents(user));
+        System.out.println(user);
     }
 }

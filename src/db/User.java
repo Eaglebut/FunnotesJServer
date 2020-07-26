@@ -3,6 +3,7 @@ package db;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class User {
@@ -11,12 +12,12 @@ public class User {
     private String password;
     private String name;
     private String surname;
-    private Event[] events;
+    private ArrayList<Event> events;
 
     public User() {
     }
 
-    public User(int id, String email, String password, String name, String surname, Event[] events) {
+    public User(int id, String email, String password, String name, String surname, ArrayList<Event> events) {
         this.setId(id);
         this.setEmail(email);
         this.setPassword(password);
@@ -44,6 +45,7 @@ public class User {
     public boolean isValid() {
         return getEmail() != null && getPassword() != null;
     }
+
 
     public User(String json) {
         getFromJSON(new JSONObject(json));
@@ -75,9 +77,9 @@ public class User {
         }
         if(keys.contains("events")){
             JSONArray jsonEvents = jsonUser.getJSONArray("events");
-            setEvents(new Event[jsonEvents.length()]);
+            setEvents(new ArrayList<>());
             for (int i = 0; i < jsonEvents.length(); i++){
-                getEvents()[i] = new Event(jsonEvents.getJSONObject(i));
+                this.events.add(new Event(jsonEvents.getJSONObject(i)));
             }
         }
     }
@@ -144,11 +146,15 @@ public class User {
         this.surname = surname;
     }
 
-    public Event[] getEvents() {
+    public ArrayList<Event> getEvents() {
         return events;
     }
 
-    public void setEvents(Event[] events) {
+    public void setEvents(ArrayList<Event> events) {
         this.events = events;
+    }
+
+    public Event getEvent(int index) {
+        return events.get(index);
     }
 }
