@@ -2,17 +2,27 @@ package db;
 
 import org.json.JSONObject;
 
-import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.Set;
 
 public class Event {
     private int id;
     private int userId;
-    private Time startTime;
-    private Time endTime;
+    private Timestamp startTime;
+    private Timestamp endTime;
     private String title;
     private String description;
 
+    private static class Constants {
+        private static final String ID = "id";
+        private static final String USER_ID = "userId";
+        private static final String START_TIME = "startTime";
+        private static final String END_TIME = "endTime";
+        private static final String TITLE = "title";
+        private static final String DESCRIPTION = "description";
+        private static final int MSECOND = 1000;
+    }
 
     public Event(String json) {
         JSONObject jsonEvent = new JSONObject(json);
@@ -26,7 +36,7 @@ public class Event {
     public Event() {
     }
 
-    public Event(int id, int userId, Time startTime, Time endTime, String title, String description) {
+    public Event(int id, int userId, Timestamp startTime, Timestamp endTime, String title, String description) {
         this.setId(id);
         this.setUserId(userId);
         this.setStartTime(startTime);
@@ -47,7 +57,7 @@ public class Event {
     public Event(int id, int userId, String title, String description) {
         this.setId(id);
         this.setUserId(userId);
-        this.setStartTime(new Time(System.currentTimeMillis()));
+        this.setStartTime(new Timestamp(System.currentTimeMillis()));
         this.setEndTime(getStartTime());
         this.setTitle(title);
         this.setDescription(description);
@@ -55,13 +65,13 @@ public class Event {
 
     public Event(int userId, String title, String description) {
         this.setUserId(userId);
-        this.setStartTime(new Time(System.currentTimeMillis()));
+        this.setStartTime(new Timestamp(System.currentTimeMillis()));
         this.setEndTime(getStartTime());
         this.setTitle(title);
         this.setDescription(description);
     }
 
-    public Event(Time startTime, Time endTime, String title, String description) {
+    public Event(Timestamp startTime, Timestamp endTime, String title, String description) {
         this.setStartTime(startTime);
         this.setEndTime(endTime);
         this.setTitle(title);
@@ -72,30 +82,30 @@ public class Event {
     public Event(String title, String description) {
         setTitle(title);
         setDescription(description);
-        this.setStartTime(new Time(System.currentTimeMillis()));
+        this.setStartTime(new Timestamp(System.currentTimeMillis()));
         this.setEndTime(getStartTime());
 
     }
 
     private void getFromJSONObject(JSONObject jsonEvent) {
         Set<String> keys = jsonEvent.keySet();
-        if (keys.contains("id")) {
-            setId(jsonEvent.getInt("id"));
+        if (keys.contains(Constants.ID)) {
+            setId(jsonEvent.getInt(Constants.ID));
         }
-        if (keys.contains("userId")) {
-            setUserId(jsonEvent.getInt("userId"));
+        if (keys.contains(Constants.USER_ID)) {
+            setUserId(jsonEvent.getInt(Constants.USER_ID));
         }
-        if (keys.contains("userId")) {
-            setStartTime(new Time(jsonEvent.getInt("startTime")));
+        if (keys.contains(Constants.START_TIME)) {
+            setStartTime(new Timestamp(jsonEvent.getInt(Constants.START_TIME)));
         }
-        if(keys.contains("userId")){
-            setEndTime(new Time(jsonEvent.getInt("endTime")));
+        if (keys.contains(Constants.END_TIME)) {
+            setEndTime(new Timestamp(jsonEvent.getInt(Constants.END_TIME)));
         }
-        if(keys.contains("userId")){
-            setTitle(jsonEvent.getString("title"));
+        if (keys.contains(Constants.TITLE)) {
+            setTitle(jsonEvent.getString(Constants.TITLE));
         }
-        if(keys.contains("userId")){
-            setDescription(jsonEvent.getString("description"));
+        if (keys.contains(Constants.DESCRIPTION)) {
+            setDescription(jsonEvent.getString(Constants.DESCRIPTION));
         }
     }
 
@@ -107,13 +117,11 @@ public class Event {
 
     public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put("id", getId());
-        long time = getStartTime().getTime();
-        jsonEvent.put("startTime", time);
-        time = getEndTime().getTime();
-        jsonEvent.put("endTime", time);
-        jsonEvent.put("title", getTitle());
-        jsonEvent.put("description", getDescription());
+        jsonEvent.put(Constants.ID, getId());
+        jsonEvent.put(Constants.START_TIME, getStartTime().getTime() / Constants.MSECOND);
+        jsonEvent.put(Constants.END_TIME, getEndTime().getTime() / Constants.MSECOND);
+        jsonEvent.put(Constants.TITLE, getTitle());
+        jsonEvent.put(Constants.DESCRIPTION, getDescription());
         return jsonEvent;
     }
 
@@ -133,19 +141,19 @@ public class Event {
         this.userId = userId;
     }
 
-    public Time getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Time startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
     }
 
-    public Time getEndTime() {
+    public Timestamp getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Time endTime) {
+    public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
     }
 
@@ -164,4 +172,11 @@ public class Event {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public boolean equals(Event event) {
+        return userId == event.userId &&
+                Objects.equals(title, event.title) &&
+                Objects.equals(description, event.description);
+    }
+
 }
