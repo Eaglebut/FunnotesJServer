@@ -111,7 +111,7 @@ public class User {
         jsonEvent.put(Constants.EMAIL, getEmail());
         jsonEvent.put(Constants.PASSWORD, getPassword());
         jsonEvent.put(Constants.NAME, getName());
-        jsonEvent.put(Constants.PASSWORD, getSurname());
+        jsonEvent.put(Constants.SURNAME, getSurname());
         JSONArray jsonEvents = new JSONArray();
         if (getEvents() != null) {
             for (Event event : getEvents()) {

@@ -20,7 +20,7 @@ public class PostgresAdapter {
 
     private static final String POSTGRES_URL = "jdbc:postgresql://localhost:5432/";
     private static final String POSTGRES_DRIVER = "org.postgresql.Driver";
-    private static final String SETTINGS_PATH = "settings";
+    private static final String SETTINGS_PATH = "Z:\\code\\java\\FunnotesJServer\\settings";
     private static final String COMMAND_FILE = "SQLCommands.json";
     private static final String CREATE_DATABASE_JSON = "create_database";
 
