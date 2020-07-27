@@ -284,7 +284,7 @@ public class PostgresAdapter {
             return FAILED;
         }
         user = getUser(user);
-        if (!user.isValid()) {
+        if (user == null || !user.isValid()) {
             return FAILED;
         }
         JSONArray sqlArray = commands.getJSONArray(DeleteUserConstants.JSON);
