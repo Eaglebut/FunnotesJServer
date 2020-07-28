@@ -14,15 +14,9 @@ public class Event {
     private String title;
     private String description;
 
-    private static class Constants {
-        private static final String ID = "id";
-        private static final String USER_ID = "userId";
-        private static final String START_TIME = "startTime";
-        private static final String END_TIME = "endTime";
-        private static final String TITLE = "title";
-        private static final String DESCRIPTION = "description";
-        private static final int MSECOND = 1000;
-    }
+
+    private static final int MSECOND = 1000;
+
 
     public Event(String json) {
         JSONObject jsonEvent = new JSONObject(json);
@@ -89,23 +83,23 @@ public class Event {
 
     private void getFromJSONObject(JSONObject jsonEvent) {
         Set<String> keys = jsonEvent.keySet();
-        if (keys.contains(Constants.ID)) {
-            setId(jsonEvent.getInt(Constants.ID));
+        if (keys.contains(PostgresAdapter.DatabaseIds.ID)) {
+            setId(jsonEvent.getInt(PostgresAdapter.DatabaseIds.ID));
         }
-        if (keys.contains(Constants.USER_ID)) {
-            setUserId(jsonEvent.getInt(Constants.USER_ID));
+        if (keys.contains(PostgresAdapter.DatabaseIds.USER_ID)) {
+            setUserId(jsonEvent.getInt(PostgresAdapter.DatabaseIds.USER_ID));
         }
-        if (keys.contains(Constants.START_TIME)) {
-            setStartTime(new Timestamp(jsonEvent.getInt(Constants.START_TIME)));
+        if (keys.contains(PostgresAdapter.DatabaseIds.START_TIME)) {
+            setStartTime(new Timestamp(jsonEvent.getLong(PostgresAdapter.DatabaseIds.START_TIME) * MSECOND));
         }
-        if (keys.contains(Constants.END_TIME)) {
-            setEndTime(new Timestamp(jsonEvent.getInt(Constants.END_TIME)));
+        if (keys.contains(PostgresAdapter.DatabaseIds.END_TIME)) {
+            setEndTime(new Timestamp(jsonEvent.getLong(PostgresAdapter.DatabaseIds.END_TIME) * MSECOND));
         }
-        if (keys.contains(Constants.TITLE)) {
-            setTitle(jsonEvent.getString(Constants.TITLE));
+        if (keys.contains(PostgresAdapter.DatabaseIds.TITLE)) {
+            setTitle(jsonEvent.getString(PostgresAdapter.DatabaseIds.TITLE));
         }
-        if (keys.contains(Constants.DESCRIPTION)) {
-            setDescription(jsonEvent.getString(Constants.DESCRIPTION));
+        if (keys.contains(PostgresAdapter.DatabaseIds.DESCRIPTION)) {
+            setDescription(jsonEvent.getString(PostgresAdapter.DatabaseIds.DESCRIPTION));
         }
     }
 
@@ -117,11 +111,11 @@ public class Event {
 
     public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put(Constants.ID, getId());
-        jsonEvent.put(Constants.START_TIME, getStartTime().getTime() / Constants.MSECOND);
-        jsonEvent.put(Constants.END_TIME, getEndTime().getTime() / Constants.MSECOND);
-        jsonEvent.put(Constants.TITLE, getTitle());
-        jsonEvent.put(Constants.DESCRIPTION, getDescription());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.ID, getId());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.START_TIME, getStartTime() != null ? getStartTime().getTime() / MSECOND : null);
+        jsonEvent.put(PostgresAdapter.DatabaseIds.END_TIME, getEndTime() != null ? getStartTime().getTime() / MSECOND : null);
+        jsonEvent.put(PostgresAdapter.DatabaseIds.TITLE, getTitle());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.DESCRIPTION, getDescription());
         return jsonEvent;
     }
 
@@ -179,4 +173,7 @@ public class Event {
                 Objects.equals(description, event.description);
     }
 
+    public boolean canInsert() {
+        return startTime != null && endTime != null && title != null && description != null;
+    }
 }

@@ -15,15 +15,9 @@ public class User {
     private String surname;
     private ArrayList<Event> events;
 
-    private static class Constants {
-        private static final String ID = "id";
-        private static final String NAME = "name";
-        private static final String SURNAME = "surname";
-        private static final String REGISTRATION_TIME = "registrationTime";
-        private static final String EMAIL = "email";
-        private static final String PASSWORD = "password";
-        private static final String EVENTS = "events";
-    }
+
+    private static final String EVENTS = "events";
+
 
     public User() {
     }
@@ -76,23 +70,23 @@ public class User {
 
     private void getFromJSON(JSONObject jsonUser) {
         Set<String> keys = jsonUser.keySet();
-        if (keys.contains(Constants.ID)) {
-            setId(jsonUser.getInt(Constants.ID));
+        if (keys.contains(PostgresAdapter.DatabaseIds.ID)) {
+            setId(jsonUser.getInt(PostgresAdapter.DatabaseIds.ID));
         }
-        if (keys.contains(Constants.EMAIL)) {
-            setEmail(jsonUser.getString(Constants.EMAIL));
+        if (keys.contains(PostgresAdapter.DatabaseIds.EMAIL)) {
+            setEmail(jsonUser.getString(PostgresAdapter.DatabaseIds.EMAIL));
         }
-        if (keys.contains(Constants.PASSWORD)) {
-            setPassword(jsonUser.getString(Constants.PASSWORD));
+        if (keys.contains(PostgresAdapter.DatabaseIds.PASSWORD)) {
+            setPassword(jsonUser.getString(PostgresAdapter.DatabaseIds.PASSWORD));
         }
-        if (keys.contains(Constants.NAME)) {
-            setName(jsonUser.getString(Constants.NAME));
+        if (keys.contains(PostgresAdapter.DatabaseIds.NAME)) {
+            setName(jsonUser.getString(PostgresAdapter.DatabaseIds.NAME));
         }
-        if (keys.contains(Constants.SURNAME)) {
-            setSurname(jsonUser.getString(Constants.SURNAME));
+        if (keys.contains(PostgresAdapter.DatabaseIds.SURNAME)) {
+            setSurname(jsonUser.getString(PostgresAdapter.DatabaseIds.SURNAME));
         }
-        if (keys.contains(Constants.EVENTS)) {
-            JSONArray jsonEvents = jsonUser.getJSONArray(Constants.EVENTS);
+        if (keys.contains(EVENTS)) {
+            JSONArray jsonEvents = jsonUser.getJSONArray(EVENTS);
             setEvents(new ArrayList<>());
             for (int i = 0; i < jsonEvents.length(); i++) {
                 this.events.add(new Event(jsonEvents.getJSONObject(i)));
@@ -107,17 +101,17 @@ public class User {
 
     public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put(Constants.ID, getId());
-        jsonEvent.put(Constants.EMAIL, getEmail());
-        jsonEvent.put(Constants.PASSWORD, getPassword());
-        jsonEvent.put(Constants.NAME, getName());
-        jsonEvent.put(Constants.SURNAME, getSurname());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.ID, getId());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.EMAIL, getEmail());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.PASSWORD, getPassword());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.NAME, getName());
+        jsonEvent.put(PostgresAdapter.DatabaseIds.SURNAME, getSurname());
         JSONArray jsonEvents = new JSONArray();
         if (getEvents() != null) {
             for (Event event : getEvents()) {
                 jsonEvents.put(event.toJSON());
             }
-            jsonEvent.put(Constants.EVENTS, jsonEvents);
+            jsonEvent.put(EVENTS, jsonEvents);
         }
         return jsonEvent;
     }

@@ -26,7 +26,7 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private String getBody(HttpServletRequest request, HttpServletResponse response) {
+    public static String getBody(HttpServletRequest request, HttpServletResponse response) {
         if (request.getContentType() == null || !request.getContentType().contains("json")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
@@ -46,7 +46,7 @@ public class UserServlet extends HttpServlet {
     }
 
 
-    private User getUser(HttpServletRequest request, HttpServletResponse response) {
+    public static User getUser(HttpServletRequest request, HttpServletResponse response) {
         String body = getBody(request, response);
         if (body == null) {
             return null;
@@ -108,6 +108,7 @@ public class UserServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
+        response.setContentType(request.getContentType());
         response.getWriter().write(user.toString());
     }
 

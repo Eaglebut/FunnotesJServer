@@ -33,19 +33,19 @@ public class PostgresAdapter {
     public static final int COMPLETED = 0;
     public static final int FAILED = 1;
 
-    private static class DatabaseIds {
-        private static final String ID = "id";
-        private static final String USER_ID = "user_id";
-        private static final String START_TIME = "start_time";
-        private static final String END_TIME = "end_time";
-        private static final String TITLE = "title";
-        private static final String DESCRIPTION = "description";
+    public static class DatabaseIds {
+        public static final String ID = "id";
+        public static final String USER_ID = "user_id";
+        public static final String START_TIME = "start_time";
+        public static final String END_TIME = "end_time";
+        public static final String TITLE = "title";
+        public static final String DESCRIPTION = "description";
 
-        private static final String NAME = "name";
-        private static final String SURNAME = "surname";
-        private static final String REGISTRATION_TIME = "registration_time";
-        private static final String EMAIL = "email";
-        private static final String PASSWORD = "password";
+        public static final String NAME = "name";
+        public static final String SURNAME = "surname";
+        public static final String REGISTRATION_TIME = "registration_time";
+        public static final String EMAIL = "email";
+        public static final String PASSWORD = "password";
     }
 
     public static class GetUserConstants {
@@ -331,7 +331,7 @@ public class PostgresAdapter {
         }
         user = getUser(user);
 
-        if (!user.isValid()) {
+        if (user == null || !user.isValid()) {
             return null;
         }
 
@@ -347,18 +347,27 @@ public class PostgresAdapter {
             statement = createStatement();
             set = statement.executeQuery(getSQLString(sqlArray));
             while (set.next()) {
-                event.setId(set.getInt(DatabaseIds.ID));
-                event.setUserId(set.getInt(DatabaseIds.USER_ID));
-                event.setStartTime(set.getTimestamp(DatabaseIds.START_TIME));
-                event.setEndTime(set.getTimestamp(DatabaseIds.END_TIME));
-                event.setTitle(set.getString(DatabaseIds.TITLE));
-                event.setDescription(set.getString(DatabaseIds.DESCRIPTION));
+                setEvent(set, event);
             }
             statement.close();
         } catch (SQLException exception) {
             exception.printStackTrace();
+            return null;
         }
+        if (event.getId() == 0) {
+            return null;
+        }
+
         return event;
+    }
+
+    private static void setEvent(ResultSet set, Event event) throws SQLException {
+        event.setId(set.getInt(DatabaseIds.ID));
+        event.setUserId(set.getInt(DatabaseIds.USER_ID));
+        event.setStartTime(set.getTimestamp(DatabaseIds.START_TIME));
+        event.setEndTime(set.getTimestamp(DatabaseIds.END_TIME));
+        event.setTitle(set.getString(DatabaseIds.TITLE));
+        event.setDescription(set.getString(DatabaseIds.DESCRIPTION));
     }
 
     public Event getEvent(User user, Event event) {
@@ -429,12 +438,7 @@ public class PostgresAdapter {
             set = statement.executeQuery(getSQLString(sqlArray));
             while (set.next()) {
                 event = new Event();
-                event.setId(set.getInt(DatabaseIds.ID));
-                event.setUserId(set.getInt(DatabaseIds.USER_ID));
-                event.setStartTime(set.getTimestamp(DatabaseIds.START_TIME));
-                event.setEndTime(set.getTimestamp(DatabaseIds.END_TIME));
-                event.setTitle(set.getString(DatabaseIds.TITLE));
-                event.setDescription(set.getString(DatabaseIds.DESCRIPTION));
+                setEvent(set, event);
                 events.add(event);
             }
             statement.close();
