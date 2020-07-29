@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @WebServlet("/event")
 public class EventServlet extends HttpServlet {
@@ -27,11 +28,10 @@ public class EventServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+    private User getUserAndEvent(HttpServletRequest request, HttpServletResponse response) {
         String bodyString = UserServlet.getBody(request, response);
         if (bodyString == null) {
-            return;
+            return null;
         }
         JSONObject bodyObject = new JSONObject(bodyString);
         User user;
@@ -42,13 +42,30 @@ public class EventServlet extends HttpServlet {
         } catch (JSONException | NullPointerException exception) {
             System.out.println(exception.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+        if (!user.isValid()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+        ArrayList<Event> events = new ArrayList<>();
+        events.add(event);
+        user.setEvents(events);
+        return user;
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+
+        User user = getUserAndEvent(request, response);
+        if (user == null) {
             return;
         }
-        if (!user.isValid() || !event.canInsert()) {
+        if (!user.getEvent(0).canInsert()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        int status = adapter.insertEvent(user, event);
+        int status = adapter.insertEvent(user, user.getEvent(0));
         if (status != PostgresAdapter.COMPLETED) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
@@ -58,27 +75,15 @@ public class EventServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String bodyString = UserServlet.getBody(request, response);
-        if (bodyString == null) {
+        User user = getUserAndEvent(request, response);
+        if (user == null) {
             return;
         }
-        JSONObject bodyObject = new JSONObject(bodyString);
-
-        User user;
-        Event event;
-        try {
-            user = new User(bodyObject.getJSONObject("user"));
-            event = new Event(bodyObject.getJSONObject("event"));
-        } catch (JSONException | NullPointerException exception) {
-            System.out.println(exception.getMessage());
+        if (user.getEvent(0).getId() == 0) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!user.isValid() || event.getId() == 0) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        event = adapter.getEvent(user, event);
+        Event event = adapter.getEvent(user, user.getEvent(0));
         if (event == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -87,4 +92,17 @@ public class EventServlet extends HttpServlet {
         response.getWriter().write(event.toString());
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
+        User user = getUserAndEvent(request, response);
+        if (user == null) {
+            return;
+        }
+        int status = adapter.deleteEvent(user, user.getEvent(0));
+        if (status != PostgresAdapter.COMPLETED) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } else {
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
+    }
 }
