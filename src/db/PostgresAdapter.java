@@ -458,18 +458,24 @@ public class PostgresAdapter {
         }
 
         user = getUser(user);
-
-        if (!user.isValid()) {
+        Event oldEvent = getEvent(user, event);
+        if (!user.isValid() || oldEvent == null) {
             return FAILED;
         }
 
         JSONArray sqlArray = commands.getJSONArray(UpdateEventConstants.JSON);
-        sqlArray.put(UpdateEventConstants.ID, String.valueOf(event.getId()));
-        sqlArray.put(UpdateEventConstants.USER_ID, String.valueOf(user.getId()));
-        sqlArray.put(UpdateEventConstants.TITLE, event.getTitle());
-        sqlArray.put(UpdateEventConstants.DESCRIPTION, event.getDescription());
-        sqlArray.put(UpdateEventConstants.START_TIME, String.valueOf(event.getStartTime().getTime() / MSECOND));
-        sqlArray.put(UpdateEventConstants.END_TIME, String.valueOf(event.getEndTime().getTime() / MSECOND));
+        sqlArray.put(UpdateEventConstants.ID,
+                String.valueOf(event.getId()));
+        sqlArray.put(UpdateEventConstants.USER_ID,
+                String.valueOf(user.getId()));
+        sqlArray.put(UpdateEventConstants.TITLE,
+                event.getTitle() != null ? event.getTitle() : oldEvent.getTitle());
+        sqlArray.put(UpdateEventConstants.DESCRIPTION,
+                event.getDescription() != null ? event.getDescription() : oldEvent.getDescription());
+        sqlArray.put(UpdateEventConstants.START_TIME,
+                String.valueOf((event.getStartTime() != null ? event.getStartTime().getTime() : oldEvent.getStartTime().getTime()) / MSECOND));
+        sqlArray.put(UpdateEventConstants.END_TIME,
+                String.valueOf((event.getEndTime() != null ? event.getEndTime().getTime() : oldEvent.getEndTime().getTime()) / MSECOND));
         return executeStatement(getSQLString(sqlArray));
     }
 

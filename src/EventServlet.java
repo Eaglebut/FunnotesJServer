@@ -105,4 +105,22 @@ public class EventServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        User user = getUserAndEvent(request, response);
+        if (user == null) {
+            return;
+        }
+        if (user.getEvent(0).getId() == 0) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        int status = adapter.updateEvent(user, user.getEvent(0));
+        if (status != PostgresAdapter.COMPLETED) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } else {
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
+    }
 }

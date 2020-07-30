@@ -113,7 +113,7 @@ public class Event {
         JSONObject jsonEvent = new JSONObject();
         jsonEvent.put(PostgresAdapter.DatabaseIds.ID, getId());
         jsonEvent.put(PostgresAdapter.DatabaseIds.START_TIME, getStartTime() != null ? getStartTime().getTime() / MSECOND : null);
-        jsonEvent.put(PostgresAdapter.DatabaseIds.END_TIME, getEndTime() != null ? getStartTime().getTime() / MSECOND : null);
+        jsonEvent.put(PostgresAdapter.DatabaseIds.END_TIME, getEndTime() != null ? getEndTime().getTime() / MSECOND : null);
         jsonEvent.put(PostgresAdapter.DatabaseIds.TITLE, getTitle());
         jsonEvent.put(PostgresAdapter.DatabaseIds.DESCRIPTION, getDescription());
         return jsonEvent;
@@ -166,6 +166,7 @@ public class Event {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     public boolean equals(Event event) {
         return userId == event.userId &&
