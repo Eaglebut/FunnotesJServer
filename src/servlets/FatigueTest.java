@@ -1,3 +1,5 @@
+package servlets;
+
 import com.oreilly.servlet.MultipartRequest;
 import org.json.JSONObject;
 
@@ -63,7 +65,7 @@ public class FatigueTest extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         System.out.println("start uploading");
         MultipartRequest request = new MultipartRequest(req, "Z:\\code\\java\\FunnotesJServer\\photos", 5_000_000);
         System.out.println("pic uploaded");

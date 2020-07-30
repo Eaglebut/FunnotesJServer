@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="98dd2605-c7d1-407f-a734-384155e23e3b" name="funServ" url="http://195.133.196.6:8080">
+        <fileTransfer accessType="SFTP" host="195.133.196.6" port="22" sshConfigId="4677f257-7d0b-42de-a765-020768209098" sshConfig="eaglebutt@195.133.196.6:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

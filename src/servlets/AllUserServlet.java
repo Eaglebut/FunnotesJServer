@@ -1,5 +1,8 @@
+package servlets;
+
 import db.PostgresAdapter;
 import db.User;
+import other.Settings;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,7 +20,7 @@ public class AllUserServlet extends HttpServlet {
     @Override
     public void init() {
         try {
-            adapter = new PostgresAdapter("postgres", "0671211664Q", "test1");
+            adapter = new PostgresAdapter(Settings.USER, "0671211664Q", "funnotes");
             adapter.connect();
         } catch (SQLException | FileNotFoundException exception) {
             exception.printStackTrace();

@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="FunnotesJServer:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/FunnotesJServer_war_exploded</output-path>
-    <root id="root">
+  <artifact type="war" name="FunnotesJServer">
+    <output-path>$PROJECT_DIR$/out/artifacts/FunnotesJServer</output-path>
+    <root id="archive" name="FunnotesJServer.war">
       <element id="javaee-facet-resources" facet="FunnotesJServer/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -11,6 +11,8 @@
           <element id="library" level="project" name="cos" />
           <element id="library" level="project" name="org.json:json:20200518" />
           <element id="library" level="project" name="postgresql-42.2.14" />
+          <element id="library" level="module" name="JUnit5.4" module-name="FunnotesJServer" />
+          <element id="library" level="project" name="junit:junit:4.13" />
         </element>
       </element>
     </root>

@@ -2,12 +2,11 @@ package db;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import other.Settings;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class PostgresAdapter {
 
@@ -18,15 +17,11 @@ public class PostgresAdapter {
     private String databaseName;
     private JSONObject commands;
 
-    private static final String POSTGRES_URL = "jdbc:postgresql://localhost:5432/";
     private static final String POSTGRES_DRIVER = "org.postgresql.Driver";
-    private static final String SETTINGS_PATH = "Z:\\code\\java\\FunnotesJServer\\settings";
-    private static final String COMMAND_FILE = "SQLCommands.json";
     private static final String CREATE_DATABASE_JSON = "create_database";
 
     private static final String DATABASE_OPENED_MESSAGE = "Opened database successfully";
     private static final String DATABASE_NOT_OPENED_MESSAGE = "Database not opened";
-    private static final String COMMAND_FILE_NOT_FOUND_MESSAGE = "Command file not found";
 
     private static final long MSECOND = 1000;
 
@@ -116,7 +111,7 @@ public class PostgresAdapter {
         setUser(user);
         setPassword(password);
         setDatabaseName(databaseName);
-        loadCommandsFromFile();
+        commands = Settings.loadCommandsFromFile();
     }
 
     public PostgresAdapter() {
@@ -151,11 +146,12 @@ public class PostgresAdapter {
         try {
             Class.forName(POSTGRES_DRIVER);
             connection = DriverManager
-                    .getConnection( POSTGRES_URL + databaseName, user, password);
+                    .getConnection(Settings.POSTGRES_URL + databaseName, user, password);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.out.println(DATABASE_NOT_OPENED_MESSAGE);
+            return;
         }
 
 
@@ -182,20 +178,6 @@ public class PostgresAdapter {
             connection.setAutoCommit(true);
         }
 
-    public void loadCommandsFromFile() throws FileNotFoundException {
-        String commandsString;
-        StringBuilder commandsStringBuilder = new StringBuilder();
-        File commands = new File(SETTINGS_PATH, COMMAND_FILE);
-        Scanner scanner;
-        if (commands.exists() && commands.canRead()) {
-            scanner = new Scanner(commands);
-            while (scanner.hasNextLine()) {
-                commandsStringBuilder.append(scanner.nextLine());
-            }
-            commandsString = commandsStringBuilder.toString();
-            this.commands = new JSONObject(commandsString);
-        } else throw new FileNotFoundException(COMMAND_FILE_NOT_FOUND_MESSAGE);
-    }
 
     public boolean isConnected() throws SQLException {
         return connection.isValid(Connection.TRANSACTION_NONE);
