@@ -1,7 +1,7 @@
 package servlets;
 
 import db.Event;
-import db.PostgresAdapter;
+import db.FunNotesDB;
 import db.User;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,13 +19,12 @@ import java.util.ArrayList;
 @WebServlet("/event")
 public class EventServlet extends HttpServlet {
 
-    PostgresAdapter adapter;
+    FunNotesDB db;
 
     @Override
     public void init() {
         try {
-            adapter = new PostgresAdapter(Settings.USER, "0671211664Q", "funnotes");
-            adapter.connect();
+            db = FunNotesDB.getInstance(Settings.USER, "0671211664Q", "funnotes");
         } catch (SQLException | FileNotFoundException exception) {
             exception.printStackTrace();
         }
@@ -68,8 +67,8 @@ public class EventServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        int status = adapter.insertEvent(user, user.getEvent(0));
-        if (status != PostgresAdapter.COMPLETED) {
+        int status = db.insertEvent(user, user.getEvent(0));
+        if (status != FunNotesDB.COMPLETED) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             response.setStatus(HttpServletResponse.SC_CREATED);
@@ -86,7 +85,7 @@ public class EventServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        Event event = adapter.getEvent(user, user.getEvent(0));
+        Event event = db.getEvent(user, user.getEvent(0));
         if (event == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -101,8 +100,8 @@ public class EventServlet extends HttpServlet {
         if (user == null) {
             return;
         }
-        int status = adapter.deleteEvent(user, user.getEvent(0));
-        if (status != PostgresAdapter.COMPLETED) {
+        int status = db.deleteEvent(user, user.getEvent(0));
+        if (status != FunNotesDB.COMPLETED) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -119,8 +118,8 @@ public class EventServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        int status = adapter.updateEvent(user, user.getEvent(0));
-        if (status != PostgresAdapter.COMPLETED) {
+        int status = db.updateEvent(user, user.getEvent(0));
+        if (status != FunNotesDB.COMPLETED) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             response.setStatus(HttpServletResponse.SC_OK);

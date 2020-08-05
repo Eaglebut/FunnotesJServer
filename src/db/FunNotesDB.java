@@ -8,14 +8,16 @@ import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class PostgresAdapter {
+public class FunNotesDB {
+
+    private static FunNotesDB INSTANCE;
 
     private Connection connection = null;
 
     private String user;
     private String password;
     private String databaseName;
-    private JSONObject commands;
+    private final JSONObject commands;
 
     private static final String POSTGRES_DRIVER = "org.postgresql.Driver";
     private static final String CREATE_DATABASE_JSON = "create_database";
@@ -107,15 +109,22 @@ public class PostgresAdapter {
         private static final int USER_ID = 1;
     }
 
-    public PostgresAdapter(String user, String password, String databaseName) throws SQLException, FileNotFoundException {
+    private FunNotesDB(String user, String password, String databaseName) throws SQLException, FileNotFoundException {
         setUser(user);
         setPassword(password);
         setDatabaseName(databaseName);
         commands = Settings.loadCommandsFromFile();
     }
 
-    public PostgresAdapter() {
+
+    public static FunNotesDB getInstance(String user, String password, String databaseName) throws FileNotFoundException, SQLException {
+        if (INSTANCE == null) {
+            INSTANCE = new FunNotesDB(user, password, databaseName);
+            INSTANCE.connect();
+        }
+        return INSTANCE;
     }
+
 
     public void setUser(String user) throws SQLException {
         if (connection != null)
@@ -142,7 +151,7 @@ public class PostgresAdapter {
         this.databaseName = databaseName;
     }
 
-    public void connect() {
+    private void connect() {
         try {
             Class.forName(POSTGRES_DRIVER);
             connection = DriverManager

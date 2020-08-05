@@ -83,23 +83,23 @@ public class Event {
 
     private void getFromJSONObject(JSONObject jsonEvent) {
         Set<String> keys = jsonEvent.keySet();
-        if (keys.contains(PostgresAdapter.DatabaseIds.ID)) {
-            setId(jsonEvent.getInt(PostgresAdapter.DatabaseIds.ID));
+        if (keys.contains(FunNotesDB.DatabaseIds.ID)) {
+            setId(jsonEvent.getInt(FunNotesDB.DatabaseIds.ID));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.USER_ID)) {
-            setUserId(jsonEvent.getInt(PostgresAdapter.DatabaseIds.USER_ID));
+        if (keys.contains(FunNotesDB.DatabaseIds.USER_ID)) {
+            setUserId(jsonEvent.getInt(FunNotesDB.DatabaseIds.USER_ID));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.START_TIME)) {
-            setStartTime(new Timestamp(jsonEvent.getLong(PostgresAdapter.DatabaseIds.START_TIME) * MSECOND));
+        if (keys.contains(FunNotesDB.DatabaseIds.START_TIME)) {
+            setStartTime(new Timestamp(jsonEvent.getLong(FunNotesDB.DatabaseIds.START_TIME) * MSECOND));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.END_TIME)) {
-            setEndTime(new Timestamp(jsonEvent.getLong(PostgresAdapter.DatabaseIds.END_TIME) * MSECOND));
+        if (keys.contains(FunNotesDB.DatabaseIds.END_TIME)) {
+            setEndTime(new Timestamp(jsonEvent.getLong(FunNotesDB.DatabaseIds.END_TIME) * MSECOND));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.TITLE)) {
-            setTitle(jsonEvent.getString(PostgresAdapter.DatabaseIds.TITLE));
+        if (keys.contains(FunNotesDB.DatabaseIds.TITLE)) {
+            setTitle(jsonEvent.getString(FunNotesDB.DatabaseIds.TITLE));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.DESCRIPTION)) {
-            setDescription(jsonEvent.getString(PostgresAdapter.DatabaseIds.DESCRIPTION));
+        if (keys.contains(FunNotesDB.DatabaseIds.DESCRIPTION)) {
+            setDescription(jsonEvent.getString(FunNotesDB.DatabaseIds.DESCRIPTION));
         }
     }
 
@@ -111,11 +111,11 @@ public class Event {
 
     public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put(PostgresAdapter.DatabaseIds.ID, getId());
-        jsonEvent.put(PostgresAdapter.DatabaseIds.START_TIME, getStartTime() != null ? getStartTime().getTime() / MSECOND : null);
-        jsonEvent.put(PostgresAdapter.DatabaseIds.END_TIME, getEndTime() != null ? getEndTime().getTime() / MSECOND : null);
-        jsonEvent.put(PostgresAdapter.DatabaseIds.TITLE, getTitle());
-        jsonEvent.put(PostgresAdapter.DatabaseIds.DESCRIPTION, getDescription());
+        jsonEvent.put(FunNotesDB.DatabaseIds.ID, getId());
+        jsonEvent.put(FunNotesDB.DatabaseIds.START_TIME, getStartTime() != null ? getStartTime().getTime() / MSECOND : null);
+        jsonEvent.put(FunNotesDB.DatabaseIds.END_TIME, getEndTime() != null ? getEndTime().getTime() / MSECOND : null);
+        jsonEvent.put(FunNotesDB.DatabaseIds.TITLE, getTitle());
+        jsonEvent.put(FunNotesDB.DatabaseIds.DESCRIPTION, getDescription());
         return jsonEvent;
     }
 

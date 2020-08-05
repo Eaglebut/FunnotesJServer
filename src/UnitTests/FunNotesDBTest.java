@@ -1,7 +1,7 @@
 package UnitTests;
 
 import db.Event;
-import db.PostgresAdapter;
+import db.FunNotesDB;
 import db.User;
 import org.junit.Assert;
 
@@ -11,17 +11,16 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class PostgresAdapterTest {
+class FunNotesDBTest {
 
-    PostgresAdapter adapter;
+    FunNotesDB adapter;
     User user;
 
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() throws FileNotFoundException, SQLException {
         user = new User("unit@test.com", "unittest", "Unit", "Test");
-        adapter = new PostgresAdapter("postgres", "0671211664Q", "test1");
-        adapter.connect();
+        adapter = FunNotesDB.getInstance("postgres", "0671211664Q", "test1");
         adapter.insertUser(user);
     }
 

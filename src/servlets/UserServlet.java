@@ -1,6 +1,6 @@
 package servlets;
 
-import db.PostgresAdapter;
+import db.FunNotesDB;
 import db.User;
 import org.json.JSONObject;
 import other.Settings;
@@ -17,13 +17,12 @@ import java.util.Scanner;
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
 
-    PostgresAdapter adapter;
+    FunNotesDB db;
 
     @Override
     public void init() {
         try {
-            adapter = new PostgresAdapter(Settings.USER, "0671211664Q", "funnotes");
-            adapter.connect();
+            db = FunNotesDB.getInstance(Settings.USER, "0671211664Q", "funnotes");
         } catch (SQLException | FileNotFoundException exception) {
             exception.printStackTrace();
         }
@@ -73,8 +72,8 @@ public class UserServlet extends HttpServlet {
         User newUser = new User(bodyJSON.getJSONObject("new_user"));
         int status;
         if (oldUser.isValid()) {
-            status = adapter.updateUser(oldUser, newUser);
-            if (status == PostgresAdapter.COMPLETED) {
+            status = db.updateUser(oldUser, newUser);
+            if (status == FunNotesDB.COMPLETED) {
                 return;
             }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -92,10 +91,10 @@ public class UserServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        int status = adapter.insertUser(user);
-        if (status == PostgresAdapter.FAILED) {
+        int status = db.insertUser(user);
+        if (status == FunNotesDB.FAILED) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
-        } else if (status == PostgresAdapter.COMPLETED) {
+        } else if (status == FunNotesDB.COMPLETED) {
             response.setStatus(HttpServletResponse.SC_CREATED);
         }
     }
@@ -106,7 +105,7 @@ public class UserServlet extends HttpServlet {
         if (user == null) {
             return;
         }
-        user = adapter.getUser(user);
+        user = db.getUser(user);
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -121,8 +120,8 @@ public class UserServlet extends HttpServlet {
         if (user == null) {
             return;
         }
-        int status = adapter.deleteUser(user);
-        if (status == PostgresAdapter.FAILED) {
+        int status = db.deleteUser(user);
+        if (status == FunNotesDB.FAILED) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }

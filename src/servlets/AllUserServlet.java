@@ -1,6 +1,6 @@
 package servlets;
 
-import db.PostgresAdapter;
+import db.FunNotesDB;
 import db.User;
 import other.Settings;
 
@@ -15,13 +15,12 @@ import java.sql.SQLException;
 @WebServlet("/user_all")
 public class AllUserServlet extends HttpServlet {
 
-    PostgresAdapter adapter;
+    FunNotesDB db;
 
     @Override
     public void init() {
         try {
-            adapter = new PostgresAdapter(Settings.USER, "0671211664Q", "funnotes");
-            adapter.connect();
+            db = FunNotesDB.getInstance(Settings.USER, "0671211664Q", "funnotes");
         } catch (SQLException | FileNotFoundException exception) {
             exception.printStackTrace();
         }
@@ -33,12 +32,12 @@ public class AllUserServlet extends HttpServlet {
         if (user == null) {
             return;
         }
-        user = adapter.getUser(user);
+        user = db.getUser(user);
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        user.setEvents(adapter.getUserEvents(user));
+        user.setEvents(db.getUserEvents(user));
         response.setContentType(request.getContentType());
         response.getWriter().write(user.toString());
     }

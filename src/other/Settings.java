@@ -24,7 +24,7 @@ public class Settings {
         WINDOWS
     }
 
-    public static final OperatingSystem OPERATING_SYSTEM = OperatingSystem.WINDOWS;
+    public static final OperatingSystem OPERATING_SYSTEM = OperatingSystem.LINUX;
 
     public static JSONObject loadCommandsFromFile() throws FileNotFoundException {
         String commandsString;

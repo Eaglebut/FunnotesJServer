@@ -70,20 +70,20 @@ public class User {
 
     private void getFromJSON(JSONObject jsonUser) {
         Set<String> keys = jsonUser.keySet();
-        if (keys.contains(PostgresAdapter.DatabaseIds.ID)) {
-            setId(jsonUser.getInt(PostgresAdapter.DatabaseIds.ID));
+        if (keys.contains(FunNotesDB.DatabaseIds.ID)) {
+            setId(jsonUser.getInt(FunNotesDB.DatabaseIds.ID));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.EMAIL)) {
-            setEmail(jsonUser.getString(PostgresAdapter.DatabaseIds.EMAIL));
+        if (keys.contains(FunNotesDB.DatabaseIds.EMAIL)) {
+            setEmail(jsonUser.getString(FunNotesDB.DatabaseIds.EMAIL));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.PASSWORD)) {
-            setPassword(jsonUser.getString(PostgresAdapter.DatabaseIds.PASSWORD));
+        if (keys.contains(FunNotesDB.DatabaseIds.PASSWORD)) {
+            setPassword(jsonUser.getString(FunNotesDB.DatabaseIds.PASSWORD));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.NAME)) {
-            setName(jsonUser.getString(PostgresAdapter.DatabaseIds.NAME));
+        if (keys.contains(FunNotesDB.DatabaseIds.NAME)) {
+            setName(jsonUser.getString(FunNotesDB.DatabaseIds.NAME));
         }
-        if (keys.contains(PostgresAdapter.DatabaseIds.SURNAME)) {
-            setSurname(jsonUser.getString(PostgresAdapter.DatabaseIds.SURNAME));
+        if (keys.contains(FunNotesDB.DatabaseIds.SURNAME)) {
+            setSurname(jsonUser.getString(FunNotesDB.DatabaseIds.SURNAME));
         }
         if (keys.contains(EVENTS)) {
             JSONArray jsonEvents = jsonUser.getJSONArray(EVENTS);
@@ -101,11 +101,11 @@ public class User {
 
     public JSONObject toJSON() {
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put(PostgresAdapter.DatabaseIds.ID, getId());
-        jsonEvent.put(PostgresAdapter.DatabaseIds.EMAIL, getEmail());
-        jsonEvent.put(PostgresAdapter.DatabaseIds.PASSWORD, getPassword());
-        jsonEvent.put(PostgresAdapter.DatabaseIds.NAME, getName());
-        jsonEvent.put(PostgresAdapter.DatabaseIds.SURNAME, getSurname());
+        jsonEvent.put(FunNotesDB.DatabaseIds.ID, getId());
+        jsonEvent.put(FunNotesDB.DatabaseIds.EMAIL, getEmail());
+        jsonEvent.put(FunNotesDB.DatabaseIds.PASSWORD, getPassword());
+        jsonEvent.put(FunNotesDB.DatabaseIds.NAME, getName());
+        jsonEvent.put(FunNotesDB.DatabaseIds.SURNAME, getSurname());
         JSONArray jsonEvents = new JSONArray();
         if (getEvents() != null) {
             for (Event event : getEvents()) {
