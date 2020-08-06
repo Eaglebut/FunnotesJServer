@@ -49,11 +49,7 @@ public class UserServlet extends HttpServlet {
 
 
     public static User getUser(HttpServletRequest request, HttpServletResponse response) {
-        String body = getBody(request, response);
-        if (body == null) {
-            return null;
-        }
-        User user = new User(body);
+        User user = new User(request.getParameter("email"), request.getParameter("password"));
         if (!user.isValid()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return null;
