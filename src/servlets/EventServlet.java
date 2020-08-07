@@ -40,29 +40,6 @@ public class EventServlet extends HttpServlet {
 
     }
 
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-
-        User user = UserServlet.getUser(request, response);
-        String body = UserServlet.getBody(request, response);
-
-        if (user == null || body == null) {
-            return;
-        }
-
-        Event event = new Event(body);
-
-        if (!event.canInsert()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        int status = db.insertEvent(user, event);
-        if (status != FunNotesDB.COMPLETED) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        } else {
-            response.setStatus(HttpServletResponse.SC_CREATED);
-        }
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
