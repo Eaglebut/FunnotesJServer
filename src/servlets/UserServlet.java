@@ -2,7 +2,6 @@ package servlets;
 
 import db.FunNotesDB;
 import db.User;
-import org.json.JSONObject;
 import other.Settings;
 
 import javax.servlet.annotation.WebServlet;
@@ -59,13 +58,12 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        User oldUser = getUser(request, response);
         String body = getBody(request, response);
-        if (body == null) {
+        if (body == null || oldUser == null || !oldUser.isValid()) {
             return;
         }
-        JSONObject bodyJSON = new JSONObject(body);
-        User oldUser = new User(bodyJSON.getJSONObject("user"));
-        User newUser = new User(bodyJSON.getJSONObject("new_user"));
+        User newUser = new User(body);
         int status;
         if (oldUser.isValid()) {
             status = db.updateUser(oldUser, newUser);
@@ -79,11 +77,13 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-        User user = getUser(request, response);
-        if (user == null) {
+        String body = getBody(request, response);
+        if (body == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (user.getName() == null || user.getSurname() == null) {
+        User user = new User(body);
+        if (user.getName() == null || user.getSurname() == null || !user.isValid()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }

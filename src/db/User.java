@@ -56,7 +56,7 @@ public class User {
     }
 
     public boolean isValid() {
-        return getEmail() != null && getPassword() != null;
+        return getEmail() != null && getPassword() != null && !getEmail().isEmpty() && !getPassword().isEmpty();
     }
 
 
@@ -168,6 +168,13 @@ public class User {
         if (events != null)
             return events.get(index);
         else return null;
+    }
+
+    public void add(Event event) {
+        if (events == null) {
+            events = new ArrayList<>();
+        }
+        events.add(event);
     }
 
     @Override
