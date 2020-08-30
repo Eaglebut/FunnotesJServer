@@ -15,7 +15,7 @@ public class Settings {
 
     public static final String POSTGRES_URL = "jdbc:postgresql://localhost:5432/";
 
-    public static final String USER = "postgres";
+    public static final String USER = "server";
 
     private static final String COMMAND_FILE_NOT_FOUND_MESSAGE = "Command file not found";
 
@@ -24,7 +24,7 @@ public class Settings {
         WINDOWS
     }
 
-    public static final OperatingSystem OPERATING_SYSTEM = OperatingSystem.WINDOWS;
+    public static final OperatingSystem OPERATING_SYSTEM = OperatingSystem.LINUX;
 
     public static JSONObject loadCommandsFromFile() throws FileNotFoundException {
         String commandsString;

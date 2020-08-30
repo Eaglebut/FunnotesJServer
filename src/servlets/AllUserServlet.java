@@ -28,17 +28,25 @@ public class AllUserServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("json");
+        System.out.println("get_all from " + request.getRemoteAddr());
         User user = UserServlet.getUser(request, response);
         if (user == null) {
+            System.out.println(response.getStatus());
             return;
         }
         user = db.getUser(user);
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            System.out.println(response.getStatus());
             return;
         }
         user.setEvents(db.getUserEvents(user));
-        response.setContentType(request.getContentType());
+
         response.getWriter().write(user.toString());
+        System.out.println(response.getStatus());
     }
+
 }

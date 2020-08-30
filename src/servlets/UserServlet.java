@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -57,7 +58,10 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        System.out.println("update user " + request.getRemoteAddr());
         User oldUser = getUser(request, response);
         String body = getBody(request, response);
         if (body == null || oldUser == null || !oldUser.isValid()) {
@@ -68,23 +72,30 @@ public class UserServlet extends HttpServlet {
         if (oldUser.isValid()) {
             status = db.updateUser(oldUser, newUser);
             if (status == FunNotesDB.COMPLETED) {
+                System.out.println(response.getStatus());
                 return;
             }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        System.out.println(response.getStatus());
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        System.out.println("add user " + request.getRemoteAddr());
         String body = getBody(request, response);
         if (body == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            System.out.println(response.getStatus());
             return;
         }
         User user = new User(body);
         if (user.getName() == null || user.getSurname() == null || !user.isValid()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            System.out.println(response.getStatus());
             return;
         }
         int status = db.insertUser(user);
@@ -93,32 +104,45 @@ public class UserServlet extends HttpServlet {
         } else if (status == FunNotesDB.COMPLETED) {
             response.setStatus(HttpServletResponse.SC_CREATED);
         }
+        System.out.println(response.getStatus());
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("json");
+        System.out.println("get user " + request.getRemoteAddr());
         User user = getUser(request, response);
         if (user == null) {
+            System.out.println(response.getStatus());
             return;
         }
         user = db.getUser(user);
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            System.out.println(response.getStatus());
             return;
         }
         response.setContentType(request.getContentType());
         response.getWriter().write(user.toString());
+        System.out.println(response.getStatus());
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        response.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        System.out.println("delete user " + request.getRemoteAddr());
         User user = getUser(request, response);
         if (user == null) {
+            System.out.println(response.getStatus());
             return;
         }
         int status = db.deleteUser(user);
         if (status == FunNotesDB.FAILED) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            System.out.println(response.getStatus());
         }
     }
 }
