@@ -1,7 +1,6 @@
 package ru.eaglebutt.funnotes.model;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -12,7 +11,7 @@ public class Group {
     private long groupId;
     private String name;
     @Column(name = "creation_time")
-    private Timestamp creationTime;
+    private long creationTime;
     private int type;
     @OneToMany(mappedBy = "group")
     private List<GroupMember> groupMemberList;
@@ -35,11 +34,11 @@ public class Group {
         this.name = name;
     }
 
-    public Timestamp getCreationTime() {
+    public long getCreationTime() {
         return creationTime;
     }
 
-    public void setCreationTime(Timestamp creationTime) {
+    public void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
     }
 

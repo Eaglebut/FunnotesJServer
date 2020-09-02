@@ -1,7 +1,6 @@
 package ru.eaglebutt.funnotes.model;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
 @Table(name = "events")
@@ -15,18 +14,17 @@ public class Event {
     private Group group;
     private String title;
     private String description;
-    private Timestamp time;
+    private long time;
     @Column(name = "creation_time")
-    private Timestamp creationTime;
+    private long creationTime;
     @Column(name = "last_updated")
-    private Timestamp lastUpdated;
+    private long lastUpdated;
     private int status;
     @Column(name = "repetition_type")
     private int repetitionType;
     @Column(name = "remind_type")
     private int remindType;
     private int importance;
-
 
     public long getEventId() {
         return eventId;
@@ -68,27 +66,27 @@ public class Event {
         this.description = description;
     }
 
-    public Timestamp getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
-    public Timestamp getCreationTime() {
+    public long getCreationTime() {
         return creationTime;
     }
 
-    public void setCreationTime(Timestamp creationTime) {
+    public void setCreationTime(long creationTime) {
         this.creationTime = creationTime;
     }
 
-    public Timestamp getLastUpdated() {
+    public long getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Timestamp lastUpdated) {
+    public void setLastUpdated(long lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
