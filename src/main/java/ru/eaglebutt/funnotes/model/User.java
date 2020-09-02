@@ -1,7 +1,6 @@
 package ru.eaglebutt.funnotes.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 //u9NFNteP
@@ -9,16 +8,24 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "user_id")
     private long userId;
     private String email;
     private String password;
     private String name;
     private String surname;
-    private long signUpTime;
+    @Column(name = "registration_time")
+    private long registrationTime;
     private String token;
-    private int signUpType;
+    @Column(name = "registration_type")
+    private int registrationType;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> groupMemberList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> eventList;
+    @OneToMany(mappedBy = "group_members")
     private List<Event> groupEventList;
 
     public User() {
@@ -64,12 +71,12 @@ public class User {
         this.surname = surname;
     }
 
-    public long getSignUpTime() {
-        return signUpTime;
+    public long getRegistrationTime() {
+        return registrationTime;
     }
 
-    public void setSignUpTime(long signUpTime) {
-        this.signUpTime = signUpTime;
+    public void setRegistrationTime(long signUpTime) {
+        this.registrationTime = signUpTime;
     }
 
     public String getToken() {
@@ -80,12 +87,12 @@ public class User {
         this.token = token;
     }
 
-    public int getSignUpType() {
-        return signUpType;
+    public int getRegistrationType() {
+        return registrationType;
     }
 
-    public void setSignUpType(int signUpType) {
-        this.signUpType = signUpType;
+    public void setRegistrationType(int signUpType) {
+        this.registrationType = signUpType;
     }
 
     public List<GroupMember> getGroupMemberList() {
