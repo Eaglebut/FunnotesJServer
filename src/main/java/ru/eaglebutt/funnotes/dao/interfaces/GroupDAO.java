@@ -1,4 +1,4 @@
-package ru.eaglebutt.funnotes.dao;
+package ru.eaglebutt.funnotes.dao.interfaces;
 
 import ru.eaglebutt.funnotes.model.Group;
 import ru.eaglebutt.funnotes.model.User;
@@ -21,6 +21,5 @@ public interface GroupDAO {
 
     void update(User user, Group group);
 
-    List<User> getGroupMemberList(Group group);
 
 }

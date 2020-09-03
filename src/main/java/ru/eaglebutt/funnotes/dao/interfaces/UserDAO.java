@@ -1,9 +1,6 @@
-package ru.eaglebutt.funnotes.dao;
+package ru.eaglebutt.funnotes.dao.interfaces;
 
-import ru.eaglebutt.funnotes.model.Event;
 import ru.eaglebutt.funnotes.model.User;
-
-import java.util.List;
 
 public interface UserDAO {
 
@@ -15,5 +12,4 @@ public interface UserDAO {
 
     void delete(User user);
 
-    List<Event> getGroupEventList(User user);
 }

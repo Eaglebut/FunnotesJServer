@@ -1,4 +1,4 @@
-package ru.eaglebutt.funnotes.dao;
+package ru.eaglebutt.funnotes.dao.interfaces;
 
 import ru.eaglebutt.funnotes.model.Event;
 import ru.eaglebutt.funnotes.model.Group;
