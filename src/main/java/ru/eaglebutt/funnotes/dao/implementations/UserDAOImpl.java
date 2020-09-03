@@ -48,7 +48,10 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void delete(User user) {
-
+        Session session = HibernateUtil.getSession();
+        session.getTransaction().begin();
+        session.delete(user);
+        session.getTransaction().commit();
     }
 
 }
