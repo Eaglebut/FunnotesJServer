@@ -6,10 +6,10 @@ public interface UserDAO {
 
     User get(String email, String password);
 
-    void insert(User user);
+    int insert(User user);
 
-    void update(User user);
+    int update(User user);
 
-    void delete(User user);
+    int delete(User user);
 
 }

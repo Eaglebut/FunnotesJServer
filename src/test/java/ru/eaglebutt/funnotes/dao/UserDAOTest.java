@@ -15,10 +15,18 @@ class UserDAOTest {
     UserDAO userDAO = new UserDAOImpl();
     User newUser = new User();
     User serverUser;
+    User invalidUser = new User();
 
     @BeforeEach
     void setUp() {
         newUser.setEmail("test" + System.currentTimeMillis() + "@test.test");
+        newUser.setPassword("test");
+        newUser.setName("Test");
+        newUser.setSurname("Тест");
+        newUser.setRegistrationType(0);
+        newUser.setRegistrationTime(new Date(System.currentTimeMillis()));
+
+        invalidUser.setEmail("test123@test.ru");
         newUser.setPassword("test");
         newUser.setName("Test");
         newUser.setSurname("Тест");
@@ -45,12 +53,21 @@ class UserDAOTest {
     @Test
     void get() {
         User user = userDAO.get(serverUser.getEmail(), serverUser.getPassword());
+        if (userDAO.get(newUser.getEmail(), newUser.getPassword()) != null) {
+            Assertions.fail();
+        }
         Assertions.assertEquals(user, serverUser);
     }
 
     @Test
     void insert() {
-        userDAO.insert(newUser);
+        boolean isSuccessful;
+        isSuccessful = userDAO.insert(invalidUser) == UserDAOImpl.FAILED;
+        isSuccessful = isSuccessful && userDAO.insert(serverUser) == UserDAOImpl.FAILED;
+        isSuccessful = isSuccessful && userDAO.insert(newUser) == UserDAOImpl.SUCCESS;
+        if (!isSuccessful) {
+            Assertions.fail();
+        }
         User user = userDAO.get(newUser.getEmail(), newUser.getPassword());
         newUser.setUserId(user.getUserId());
         userDAO.delete(user);

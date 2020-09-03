@@ -11,15 +11,17 @@ public interface GroupDAO {
 
     List<Group> get(User user);
 
-    void addUser(User user, Group group);
+    List<Group> getAll();
 
-    void deleteUser(User user, Group group);
+    int addUser(User user, Group group);
 
-    void insert(User user);
+    int deleteUser(User user, Group group);
 
-    void delete(User user, Group group);
+    int insert(User user);
 
-    void update(User user, Group group);
+    int delete(User user, Group group);
+
+    int update(User user, Group group);
 
 
 }
