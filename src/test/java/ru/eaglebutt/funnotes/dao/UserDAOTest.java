@@ -54,10 +54,13 @@ class UserDAOTest {
     @Test
     void get() {
         try {
+            userDAO.get(newUser.getEmail(), newUser.getPassword());
+            Assertions.fail();
+        } catch (NotFoundException notFoundException) {
+            notFoundException.printStackTrace();
+        }
+        try {
             User user = userDAO.get(serverUser.getEmail(), serverUser.getPassword());
-            if (userDAO.get(newUser.getEmail(), newUser.getPassword()) != null) {
-                Assertions.fail();
-            }
             Assertions.assertEquals(user, serverUser);
         } catch (NotFoundException e) {
             e.printStackTrace();
