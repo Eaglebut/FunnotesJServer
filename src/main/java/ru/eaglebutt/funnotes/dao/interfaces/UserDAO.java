@@ -1,10 +1,11 @@
 package ru.eaglebutt.funnotes.dao.interfaces;
 
+import javassist.NotFoundException;
 import ru.eaglebutt.funnotes.model.User;
 
 public interface UserDAO {
 
-    User get(String email, String password);
+    User get(String email, String password) throws NotFoundException;
 
     int insert(User user);
 

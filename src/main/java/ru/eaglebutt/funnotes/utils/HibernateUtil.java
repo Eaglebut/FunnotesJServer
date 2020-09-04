@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package ru.eaglebutt.funnotes;
+package ru.eaglebutt.funnotes.utils;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

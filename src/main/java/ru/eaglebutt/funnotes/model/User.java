@@ -6,26 +6,28 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
+import static ru.eaglebutt.funnotes.utils.Constants.Strings.UserStrings.*;
+
 @Setter
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = tableName)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = userIDSQLName)
     private Long userId;
     private String email;
     private String password;
     private String name;
     private String surname;
-    @Column(name = "registration_time"/*, columnDefinition = "default"*/)
+    @Column(name = registrationTimeSQLName)
     private Date registrationTime;
     private String token;
-    @Column(name = "registration_type")
+    @Column(name = registrationTypeSQLName)
     private int registrationType;
     /*private List<GroupMember> groupMemberList;
     private List<Event> eventList;

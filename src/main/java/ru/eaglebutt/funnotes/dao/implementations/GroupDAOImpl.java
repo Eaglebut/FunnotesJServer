@@ -2,10 +2,10 @@ package ru.eaglebutt.funnotes.dao.implementations;
 
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
-import ru.eaglebutt.funnotes.HibernateUtil;
 import ru.eaglebutt.funnotes.dao.interfaces.GroupDAO;
 import ru.eaglebutt.funnotes.model.Group;
 import ru.eaglebutt.funnotes.model.User;
+import ru.eaglebutt.funnotes.utils.HibernateUtil;
 
 import java.util.List;
 
@@ -16,7 +16,6 @@ public class GroupDAOImpl implements GroupDAO {
         try {
             Session session = HibernateUtil.getSession();
             session.getTransaction().begin();
-
             Group group = session.get(Group.class, groupId);
             session.getTransaction().commit();
             return group;

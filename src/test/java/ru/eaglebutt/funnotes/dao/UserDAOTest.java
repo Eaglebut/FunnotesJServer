@@ -1,5 +1,6 @@
 package ru.eaglebutt.funnotes.dao;
 
+import javassist.NotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,43 +53,63 @@ class UserDAOTest {
 
     @Test
     void get() {
-        User user = userDAO.get(serverUser.getEmail(), serverUser.getPassword());
-        if (userDAO.get(newUser.getEmail(), newUser.getPassword()) != null) {
+        try {
+            User user = userDAO.get(serverUser.getEmail(), serverUser.getPassword());
+            if (userDAO.get(newUser.getEmail(), newUser.getPassword()) != null) {
+                Assertions.fail();
+            }
+            Assertions.assertEquals(user, serverUser);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
             Assertions.fail();
         }
-        Assertions.assertEquals(user, serverUser);
     }
 
     @Test
     void insert() {
-        boolean isSuccessful;
-        isSuccessful = userDAO.insert(invalidUser) == UserDAOImpl.FAILED;
-        isSuccessful = isSuccessful && userDAO.insert(serverUser) == UserDAOImpl.FAILED;
-        isSuccessful = isSuccessful && userDAO.insert(newUser) == UserDAOImpl.SUCCESS;
-        if (!isSuccessful) {
+        try {
+            boolean isSuccessful;
+            isSuccessful = userDAO.insert(invalidUser) == UserDAOImpl.FAILED;
+            isSuccessful = isSuccessful && userDAO.insert(serverUser) == UserDAOImpl.FAILED;
+            isSuccessful = isSuccessful && userDAO.insert(newUser) == UserDAOImpl.SUCCESS;
+            if (!isSuccessful) {
+                Assertions.fail();
+            }
+            User user = userDAO.get(newUser.getEmail(), newUser.getPassword());
+            newUser.setUserId(user.getUserId());
+            userDAO.delete(user);
+            Assertions.assertEquals(user, newUser);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
             Assertions.fail();
         }
-        User user = userDAO.get(newUser.getEmail(), newUser.getPassword());
-        newUser.setUserId(user.getUserId());
-        userDAO.delete(user);
-        Assertions.assertEquals(user, newUser);
     }
 
     @Test
     void update() {
-        serverUser.setName("Test");
-        userDAO.update(serverUser);
-        User user = userDAO.get(serverUser.getEmail(), serverUser.getPassword());
-        Assertions.assertEquals(user, serverUser);
-        serverUser.setName("Тест");
-        userDAO.update(serverUser);
+        try {
+            serverUser.setName("Test");
+            userDAO.update(serverUser);
+            User user = userDAO.get(serverUser.getEmail(), serverUser.getPassword());
+            Assertions.assertEquals(user, serverUser);
+            serverUser.setName("Тест");
+            userDAO.update(serverUser);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            Assertions.fail();
+        }
     }
 
     @Test
     void delete() {
-        newUser.setName("Deleted");
-        userDAO.insert(newUser);
-        newUser = userDAO.get(newUser.getEmail(), newUser.getPassword());
-        userDAO.delete(newUser);
+        try {
+            newUser.setName("Deleted");
+            userDAO.insert(newUser);
+            newUser = userDAO.get(newUser.getEmail(), newUser.getPassword());
+            userDAO.delete(newUser);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            Assertions.fail();
+        }
     }
 }
