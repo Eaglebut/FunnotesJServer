@@ -11,6 +11,9 @@ import ru.eaglebutt.funnotes.model.User;
 
 import java.util.Date;
 
+import static ru.eaglebutt.funnotes.utils.Constants.Statuses.FAILED;
+import static ru.eaglebutt.funnotes.utils.Constants.Statuses.SUCCESSFUL;
+
 class UserDAOTest {
 
     UserDAO userDAO = new UserDAOImpl();
@@ -24,14 +27,14 @@ class UserDAOTest {
         newUser.setPassword("test");
         newUser.setName("Test");
         newUser.setSurname("Тест");
-        newUser.setRegistrationType(0);
+        newUser.setRegistrationType(User.RegistrationTypes.ORDINAL);
         newUser.setRegistrationTime(new Date(System.currentTimeMillis()));
 
         invalidUser.setEmail("test123@test.ru");
         newUser.setPassword("test");
         newUser.setName("Test");
         newUser.setSurname("Тест");
-        newUser.setRegistrationType(0);
+        newUser.setRegistrationType(User.RegistrationTypes.ORDINAL);
         newUser.setRegistrationTime(new Date(System.currentTimeMillis()));
 
 
@@ -42,8 +45,8 @@ class UserDAOTest {
         String surname = "Русский";
         Date registrationTime = new Date(1599130180318L);
         String token = null;
-        int registrationType = 0;
-        serverUser = new User(user_id, email, password, name, surname, registrationTime, token, registrationType);
+        User.RegistrationTypes registrationType = User.RegistrationTypes.ORDINAL;
+        serverUser = new User(user_id, email, password, name, surname, registrationTime, token, registrationType, null);
     }
 
     @AfterEach
@@ -72,9 +75,9 @@ class UserDAOTest {
     void insert() {
         try {
             boolean isSuccessful;
-            isSuccessful = userDAO.insert(invalidUser) == UserDAOImpl.FAILED;
-            isSuccessful = isSuccessful && userDAO.insert(serverUser) == UserDAOImpl.FAILED;
-            isSuccessful = isSuccessful && userDAO.insert(newUser) == UserDAOImpl.SUCCESS;
+            isSuccessful = userDAO.insert(invalidUser) == FAILED;
+            isSuccessful = isSuccessful && userDAO.insert(serverUser) == FAILED;
+            isSuccessful = isSuccessful && userDAO.insert(newUser) == SUCCESSFUL;
             if (!isSuccessful) {
                 Assertions.fail();
             }

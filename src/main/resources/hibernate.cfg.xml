@@ -25,7 +25,8 @@
         <property name="show_sql">true</property>
 
         <mapping class="ru.eaglebutt.funnotes.model.User"/>
-
+        <mapping class="ru.eaglebutt.funnotes.model.Group"/>
+        <mapping class="ru.eaglebutt.funnotes.model.GroupMember"/>
     </session-factory>
 
 </hibernate-configuration>

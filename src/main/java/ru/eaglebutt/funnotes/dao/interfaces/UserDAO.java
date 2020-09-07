@@ -2,15 +2,16 @@ package ru.eaglebutt.funnotes.dao.interfaces;
 
 import javassist.NotFoundException;
 import ru.eaglebutt.funnotes.model.User;
+import ru.eaglebutt.funnotes.utils.Constants;
 
 public interface UserDAO {
 
     User get(String email, String password) throws NotFoundException;
 
-    int insert(User user);
+    Constants.Statuses insert(User user);
 
-    int update(User user);
+    Constants.Statuses update(User user);
 
-    int delete(User user);
+    Constants.Statuses delete(User user);
 
 }

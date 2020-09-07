@@ -2,6 +2,7 @@ package ru.eaglebutt.funnotes.model;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -9,7 +10,7 @@ import java.util.Date;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class Event implements Serializable {
 
     private long eventId;
     private User user;
@@ -23,4 +24,20 @@ public class Event {
     private int repetitionType;
     private int remindType;
     private int importance;
+
+    public enum Statuses {
+        NONE
+    }
+
+    public enum RepetitionTypes {
+        DONT_REPEAT
+    }
+
+    public enum RemindType {
+        DONT_REMIND
+    }
+
+    public enum ImportanceTypes {
+        ORDINAL
+    }
 }

@@ -13,13 +13,15 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
+import static ru.eaglebutt.funnotes.utils.Constants.Statuses.FAILED;
+import static ru.eaglebutt.funnotes.utils.Constants.Statuses.SUCCESSFUL;
+import static ru.eaglebutt.funnotes.utils.Constants.Strings.UserStrings.UserNotFoundedExceptionString;
 import static ru.eaglebutt.funnotes.utils.Constants.Strings.UserStrings.emailSQLName;
+
 
 public class UserDAOImpl implements UserDAO {
 
 
-    public static int SUCCESS = 0;
-    public static int FAILED = 1;
 
     @Override
     public User get(String email, String password) throws NotFoundException {
@@ -31,6 +33,7 @@ public class UserDAOImpl implements UserDAO {
             criteriaQuery.select(root);
             criteriaQuery.where(criteriaBuilder.equal(root.get(emailSQLName), email));
             List<User> users = session.createQuery(criteriaQuery).getResultList();
+            session.close();
             for (User user : users) {
                 if (user.getPassword().equals(password)) {
                     return user;
@@ -39,17 +42,18 @@ public class UserDAOImpl implements UserDAO {
         } catch (ConstraintViolationException e) {
             e.printStackTrace();
         }
-        throw new NotFoundException(Constants.Strings.UserNotFoundedExceptionString);
+        throw new NotFoundException(UserNotFoundedExceptionString);
     }
 
     @Override
-    public int insert(User user) {
+    public Constants.Statuses insert(User user) {
         try {
             Session session = HibernateUtil.getSession();
             session.getTransaction().begin();
             session.save(user);
             session.getTransaction().commit();
-            return SUCCESS;
+            session.close();
+            return SUCCESSFUL;
         } catch (ConstraintViolationException e) {
             e.printStackTrace();
             return FAILED;
@@ -57,13 +61,14 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public int update(User user) {
+    public Constants.Statuses update(User user) {
         try {
             Session session = HibernateUtil.getSession();
             session.getTransaction().begin();
             session.update(user);
             session.getTransaction().commit();
-            return SUCCESS;
+            session.close();
+            return SUCCESSFUL;
         } catch (ConstraintViolationException e) {
             e.printStackTrace();
             return FAILED;
@@ -71,13 +76,14 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public int delete(User user) {
+    public Constants.Statuses delete(User user) {
         try {
             Session session = HibernateUtil.getSession();
             session.getTransaction().begin();
             session.delete(user);
             session.getTransaction().commit();
-            return SUCCESS;
+            session.close();
+            return SUCCESSFUL;
         } catch (ConstraintViolationException e) {
             e.printStackTrace();
             return FAILED;
